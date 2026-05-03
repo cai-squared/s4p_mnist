@@ -1,20 +1,33 @@
-# S4P_MNIST
+# PROJECT - S4P MNIST
 
-machine learning for MNIST
+## 👥 Team Information
 
-## Team Information
+- **Team Name:** S4P
+- **Team Members:** *Cai Cindy (ccai5@depaul.edu)*
+                    *Riffa Hammed (rriffaha@depaul.edu)*
+                    *Sai Subodh Gundam Raju (sgundamr@depaul.edu)*
+                    *Saumyaa Kannan (skannan3@depaul.edu)*
+- **Course & Section:** SE489 ML ENGINEERING FOR PRODUCTION
+                        Section:(930 Online: Sync - 910 Online: Async)
 
-- **Project Lead:** Cindy Cai (ccai5@depaul.edu)
-- **Team Members:** *To be filled in*
+## 🧠 Project Overview
 
-## Project Overview
+🚀 S4P MNIST is an end-to-end machine learning engineering project that designs, 
+trains, evaluates, and deploys a handwritten digit classifier on the MNIST dataset - 70,000 grayscale images of handwritten digits around 10 classes (0-9) across 60,000 training 
+and 10,000 test samples. The project goes beyond model accuracy, emphasizing 
+production-grade MLOps practices: reproducible data pipelines, experiment 
+tracking, containerization, continuous integration, and a live deployed 
+interface for real-time predictions. Built across three phases, S4P MNIST 
+demonstrates a complete ML project lifecycle from raw data ingestion through 
+to a scalable, monitored, and user-accessible deployment.
 
-S4P_MNIST is a machine learning project that implements machine learning for MNIST.
-
-**Key Objectives:**
-- [ ] Objective 1
-- [ ] Objective 2
-- [ ] Objective 3
+🎯 **Key Objectives:**
+- [ ] 🔬 Design and train a high-accuracy digit classification model with fully 
+      reproducible data processing and experiment tracking
+- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools 
+      to ensure consistent, scalable execution
+- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable 
+      of making real-time predictions on new handwritten digit inputs
 
 ## Architecture Diagram
 
@@ -96,10 +109,8 @@ make help
 - **matplotlib** >= 3.9.0 - Visualization
 - **tqdm** >= 4.66.0 - Progress bars
 - **pyyaml** >= 6.0 - Configuration files
-### Deep Learning (PyTorch)
-- **torch** >= 2.3.0 - PyTorch framework
 ### Experiment Tracking
-- **wandb** >= 0.18.0 - Weights & Biases
+- **mlflow** >= 2.16.0 - MLflow experiment tracking
 ### Configuration Management
 - **hydra-core** >= 1.3.0 - Hydra configuration framework
 - **omegaconf** >= 2.3.0 - Hierarchical configuration
@@ -115,12 +126,12 @@ make help
 
 ## Project Structure
 
-This template uses the modern **`src/` layout** — the importable package lives in `src/S4P_MNIST/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
+This template uses the modern **`src/` layout** — the importable package lives in `src/s4p_mnist/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
 
 ```
-S4P_MNIST/                  # Repository root
+s4p_mnist/                  # Repository root
 ├── src/
-│   └── S4P_MNIST/          # Importable Python package
+│   └── s4p_mnist/          # Importable Python package
 │       ├── __init__.py                # Version + package metadata
 │       ├── config.py                  # Paths & typed config (PROJECT_ROOT, TrainingConfig, ...)
 │       ├── logging_config.py          # setup_logging() + get_logger()
@@ -190,7 +201,7 @@ S4P_MNIST/                  # Repository root
 | Catches packaging bugs early | ✅ | ❌ |
 | Adopted by | attrs, httpx, pydantic, flask, sqlalchemy | Older data-science templates |
 
-Data and model artifacts are accessed via the constants in `S4P_MNIST.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
+Data and model artifacts are accessed via the constants in `s4p_mnist.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
 
 ## Common Commands
 
@@ -223,14 +234,10 @@ make docs
 
 ## Contribution Summary
 
-- [ ] Team members have been assigned
-- [ ] Development environment has been set up
-- [ ] Initial data exploration completed
-- [ ] Model baseline established
-- [ ] Evaluation metrics defined
-- [ ] Documentation updated
-- [ ] All tests passing
-- [ ] Code reviewed and merged
+- **Cindy Cai** — Data exploration, EDA notebook, code review
+- **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
+- **Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
+- **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
 
 ## References
 
