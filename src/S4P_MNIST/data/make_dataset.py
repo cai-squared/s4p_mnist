@@ -86,7 +86,11 @@ def make_dataset(
     logger.info("Building processed dataset: %s -> %s", raw_dir, processed_dir)
     X_train, y_train, X_test, y_test = load_raw(raw_dir=raw_dir)
     save_processed(
-        X_train, y_train, X_test, y_test, processed_dir=processed_dir,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        processed_dir=processed_dir,
     )
     logger.info("Done. Processed dataset is ready in %s", processed_dir)
 

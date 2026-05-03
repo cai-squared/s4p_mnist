@@ -22,9 +22,9 @@ FIGURES_DIR: Path = REPORTS_DIR / "figures"
 class TrainingConfig:
     """Hyperparameters and training-run settings."""
 
-    epochs: int = 10
-    batch_size: int = 32
-    learning_rate: float = 1e-3
+    epochs: int = 18
+    batch_size: int = 128
+    learning_rate: float = 1.2e-3
     seed: int = 42
     early_stopping_patience: int = 10
 
