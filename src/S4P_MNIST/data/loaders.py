@@ -152,9 +152,7 @@ def _read_idx_labels(path: Path) -> LabelArray:
         body = f.read()
 
     if len(body) != count:
-        raise ValueError(
-            f"{path}: body has {len(body)} bytes, expected {count}"
-        )
+        raise ValueError(f"{path}: body has {len(body)} bytes, expected {count}")
 
     labels: LabelArray = np.frombuffer(body, dtype=np.uint8)
     logger.debug("Parsed %d labels from %s", count, path)
@@ -217,9 +215,7 @@ def load_raw(
     if y_train.max() > 9 or y_test.max() > 9:
         raise ValueError("Found label outside [0, 9]; expected MNIST digit labels")
 
-    logger.info(
-        "Loaded raw MNIST: train=%s, test=%s", X_train.shape, X_test.shape
-    )
+    logger.info("Loaded raw MNIST: train=%s, test=%s", X_train.shape, X_test.shape)
     return X_train, y_train, X_test, y_test
 
 
@@ -257,10 +253,14 @@ def save_processed(
 
     logger.info(
         "Saved %s (%s), %s (%s), %s (%s), %s (%s)",
-        PROCESSED_X_TRAIN, X_train.shape,
-        PROCESSED_Y_TRAIN, y_train.shape,
-        PROCESSED_X_TEST, X_test.shape,
-        PROCESSED_Y_TEST, y_test.shape,
+        PROCESSED_X_TRAIN,
+        X_train.shape,
+        PROCESSED_Y_TRAIN,
+        y_train.shape,
+        PROCESSED_X_TEST,
+        X_test.shape,
+        PROCESSED_Y_TEST,
+        y_test.shape,
     )
 
 
@@ -293,7 +293,10 @@ def load_processed(
     logger.info("Loading processed arrays from %s", processed_dir)
 
     expected = [
-        PROCESSED_X_TRAIN, PROCESSED_Y_TRAIN, PROCESSED_X_TEST, PROCESSED_Y_TEST,
+        PROCESSED_X_TRAIN,
+        PROCESSED_Y_TRAIN,
+        PROCESSED_X_TEST,
+        PROCESSED_Y_TEST,
     ]
     missing = [name for name in expected if not (processed_dir / name).is_file()]
     if missing:

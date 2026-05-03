@@ -1,6 +1,6 @@
 """Plotting utilities."""
 
-from S4P_MNIST.visualization.visualize import (
+from s4p_mnist.visualization.visualize import (
     plot_confusion_matrix,
     plot_training_history,
 )

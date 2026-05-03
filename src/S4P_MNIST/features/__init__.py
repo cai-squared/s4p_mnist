@@ -1,5 +1,5 @@
 """Feature engineering."""
 
-from S4P_MNIST.features.build_features import build_features
+from s4p_mnist.features.build_features import build_features
 
 __all__ = ["build_features"]
