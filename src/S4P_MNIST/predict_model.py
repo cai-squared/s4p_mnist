@@ -1,34 +1,56 @@
-"""Model inference entrypoint."""
-
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import cast
 
-from S4P_MNIST.config import MODELS_DIR, PROCESSED_DATA_DIR
-from S4P_MNIST.logging_config import get_logger, setup_logging
-from S4P_MNIST.models.model import Model
+import numpy as np
+import pandas as pd
+
+from s4p_mnist.config import MODELS_DIR, PROCESSED_DATA_DIR
+from s4p_mnist.logging_config import get_logger, setup_logging
+from s4p_mnist.models.model import Model
 
 logger = get_logger(__name__)
 
 
+def _build_feature_matrix(df: pd.DataFrame) -> np.ndarray:
+    drop = {"label", "y", "target"}
+    cols = [c for c in df.columns if str(c).strip().lower() not in drop]
+    if not cols:
+        raise ValueError("Input CSV has no feature columns after removing labels.")
+    x = df[cols].to_numpy(dtype=np.float32)
+    if x.shape[1] != 784:
+        logger.warning(
+            "Expected 784 pixel columns; got %d. Predictions may be wrong.",
+            x.shape[1],
+        )
+    return cast(np.ndarray, x)
+
+
 def predict(model_path: Path, input_path: Path, output_path: Path) -> None:
-    """Load a trained model and write predictions for ``input_path`` to ``output_path``."""
     logger.info("Loading model from %s", model_path)
     model = Model.load(model_path)
 
     logger.info("Scoring %s", input_path)
-    _ = model  # replace with: df = pd.read_csv(input_path); preds = model.predict(df)
+    df = pd.read_csv(input_path)
+    x = _build_feature_matrix(df)
+    preds = model.predict(x)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    logger.info("Writing predictions to %s", output_path)
+    out = pd.DataFrame({"prediction": preds})
+    out.to_csv(output_path, index=False)
+    logger.info("Wrote %d rows to %s", len(out), output_path)
 
 
 def main() -> None:
-    """CLI entrypoint for batch prediction."""
-    parser = argparse.ArgumentParser(description="Generate predictions from a trained model")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", type=Path, default=MODELS_DIR / "model.joblib")
-    parser.add_argument("--input", type=Path, default=PROCESSED_DATA_DIR / "test.csv")
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=PROCESSED_DATA_DIR / "input.csv",
+    )
     parser.add_argument("--output", type=Path, default=Path("predictions.csv"))
     args = parser.parse_args()
 
