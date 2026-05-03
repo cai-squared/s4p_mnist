@@ -29,6 +29,7 @@ and interactions between different parts of the system.
 
 ### Phase 1: Project Design & Model Development
 - See [PHASE1.md](PHASE1.md) for detailed checklist
+- See [docs/PHASE1.md](docs/PHASE1.md) for phase documentation.
 
 ### Phase 2: Containerization & Monitoring
 - See [PHASE2.md](PHASE2.md) for detailed checklist

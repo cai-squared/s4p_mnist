@@ -1,48 +1,47 @@
-# Phase 1: Project Setup and Data Exploration
+# PHASE 1: Project Design & Model Development
 
-## Overview
-This phase covers the initial project setup, environment configuration, and exploratory data analysis.
+## 1. Project Proposal
 
-## Objectives
+### 1.1 Project Scope and Objectives
+### 1.2 Selection of Data
+### 1.3 Model Considerations
+### 1.4 Open-Source Tools
 
-- [ ] Set up development environment
-- [ ] Explore and understand the data
-- [ ] Document data characteristics
-- [ ] Create data processing pipeline scaffold
-- [ ] Establish baseline metrics
+## 2. Code Organization and Setup
 
-## Deliverables
+### 2.1 Repository Setup
 
-### 1. Development Environment
-- Python 3.11 environment configured
-- All dependencies installed from requirements.txt
-- Pre-commit hooks configured
-- Tests running successfully
+The S4P_MNIST Github repository was created from a Cookiecutter template. The repository structure is detailed in the README.md under the Project Structure section. 
 
-### 2. Data Exploration Report
-- Dataset overview and statistics
-- Missing value analysis
-- Feature distributions
-- Correlations and relationships
-- Data quality issues identified
+### 2.2 Environment Setup
 
-### 3. Data Processing Pipeline
-- Data loading functions implemented
-- Data cleaning procedures documented
-- Feature engineering approach outlined
-- Data validation checks in place
+For this project, we'll create a conda environment. To do so, we run 
 
-## Key Findings
+``` 
+conda create -n s4p_environment python=3.11
+```
 
-*To be filled in during Phase 1*
+To install the required packages, use the `make install` or `make dev` commands. This will install the packages described by requirements.txt and/or requirements_dev.txt. 
 
-## Next Steps
+## 3. Version Control and Collaboration
 
-Move to Phase 2 once data exploration is complete and initial processing pipeline is established.
+### 3.1 Git Usage
 
-## Status
+### 3.2 Team Collaboration
 
-- Start Date: 
-- Estimated Completion: 
-- Actual Completion: 
-- Status: Not Started
+## 4. Data Handling
+
+### 4.1 Data Preparation
+### 4.2 Data Documentation
+
+## 5. Model Training
+
+### 5.1 Training Infrastructure
+### 5.2 Initial Training & Evaluation
+
+## 6. Documentation & Reporting
+
+### 6.1 Project README
+### 6.2 Code Documentation
+
+## Key Findings & Challenges
