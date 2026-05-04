@@ -1,4 +1,4 @@
-"""Tests for the MNIST CNN ``Model``."""
+﻿"""Tests for the MNIST CNN ``Model``."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ import joblib
 import numpy as np
 import pytest
 
-from s4p_mnist.models.base import BaseModel
-from s4p_mnist.models.model import Model
+from S4P_MNIST.models.base import BaseModel
+from S4P_MNIST.models.model import Model
 
 
 class TestModel:

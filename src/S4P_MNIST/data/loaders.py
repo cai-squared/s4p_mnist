@@ -16,7 +16,7 @@ The processed arrays produced by this module are kept as ``uint8`` with
 pixel values in ``[0, 255]`` and image shape ``(N, 28, 28)``. Normalization
 and reshaping/flattening are intentionally *not* performed here: those are
 modeling/feature-engineering concerns and live in
-``s4p_mnist.features.build_features``. Keeping the data layer
+``S4P_MNIST.features.build_features``. Keeping the data layer
 transformation-free means ``data/processed/`` remains a single,
 unambiguous source of truth.
 """
@@ -30,8 +30,8 @@ from typing import Final
 import numpy as np
 import numpy.typing as npt
 
-from s4p_mnist.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
-from s4p_mnist.logging_config import get_logger
+from S4P_MNIST.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from S4P_MNIST.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -173,7 +173,7 @@ def load_raw(
     ----------
     raw_dir : Path, optional
         Directory containing the four IDX files. Defaults to
-        :data:`s4p_mnist.config.RAW_DATA_DIR`.
+        :data:`S4P_MNIST.config.RAW_DATA_DIR`.
 
     Returns
     -------
@@ -238,7 +238,7 @@ def save_processed(
         Arrays to persist.
     processed_dir : Path, optional
         Output directory. Defaults to
-        :data:`s4p_mnist.config.PROCESSED_DATA_DIR`.
+        :data:`S4P_MNIST.config.PROCESSED_DATA_DIR`.
     """
     processed_dir = (
         Path(processed_dir) if processed_dir is not None else PROCESSED_DATA_DIR
@@ -273,7 +273,7 @@ def load_processed(
     ----------
     processed_dir : Path, optional
         Directory containing the four ``.npy`` files. Defaults to
-        :data:`s4p_mnist.config.PROCESSED_DATA_DIR`.
+        :data:`S4P_MNIST.config.PROCESSED_DATA_DIR`.
 
     Returns
     -------
