@@ -1,6 +1,6 @@
 # Data Directory
 
-Store all data files for the S4P_MNIST project here.
+Store all data files for the s4p_mnist project here.
 
 ## Structure
 

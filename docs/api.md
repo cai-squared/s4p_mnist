@@ -1,13 +1,13 @@
 # API Reference
 
-The package is importable as `S4P_MNIST` after running `pip install -e .`.
+The package is importable as `s4p_mnist` after running `pip install -e .`.
 
-## `S4P_MNIST.config`
+## `s4p_mnist.config`
 
 Project-wide path constants and typed config dataclasses.
 
 ```python
-from S4P_MNIST.config import (
+from s4p_mnist.config import (
     PROJECT_ROOT,
     DATA_DIR, RAW_DATA_DIR, PROCESSED_DATA_DIR,
     MODELS_DIR, REPORTS_DIR, FIGURES_DIR,
@@ -17,16 +17,16 @@ from S4P_MNIST.config import (
 
 Use these constants instead of hard-coded relative paths — they resolve against the repo root regardless of the current working directory.
 
-## `S4P_MNIST.logging_config`
+## `s4p_mnist.logging_config`
 
 ```python
-from S4P_MNIST.logging_config import setup_logging, get_logger
+from s4p_mnist.logging_config import setup_logging, get_logger
 
 setup_logging(level="INFO")
 logger = get_logger(__name__)
 ```
 
-## `S4P_MNIST.data`
+## `s4p_mnist.data`
 
 | Function | Purpose |
 |---|---|
@@ -35,17 +35,17 @@ logger = get_logger(__name__)
 | `save_processed(df, filename)` | Write CSV to `data/processed/` |
 | `process_data(input_dir, output_dir)` | Raw → processed pipeline |
 
-CLI: `python -m S4P_MNIST.data.make_dataset [--input PATH] [--output PATH]`
+CLI: `python -m s4p_mnist.data.make_dataset [--input PATH] [--output PATH]`
 
-## `S4P_MNIST.features`
+## `s4p_mnist.features`
 
 ```python
-from S4P_MNIST.features import build_features
+from s4p_mnist.features import build_features
 
 df_features = build_features(df_processed)
 ```
 
-## `S4P_MNIST.models`
+## `s4p_mnist.models`
 
 ### `BaseModel` (abstract)
 
@@ -57,7 +57,7 @@ Reference implementation scaffold. Serializes via `joblib`.
 
 ```python
 from pathlib import Path
-from S4P_MNIST.models import Model
+from s4p_mnist.models import Model
 
 model = Model(config={"lr": 0.01})
 # model.fit(X_train, y_train)
@@ -65,25 +65,25 @@ model.save(Path("models/model.joblib"))
 reloaded = Model.load(Path("models/model.joblib"))
 ```
 
-## `S4P_MNIST.evaluation`
+## `s4p_mnist.evaluation`
 
 ```python
-from S4P_MNIST.evaluation import classification_report, regression_report
+from s4p_mnist.evaluation import classification_report, regression_report
 
 metrics = classification_report(y_true, y_pred)
 # -> {"accuracy": ..., "precision": ..., "recall": ..., "f1": ...}
 ```
 
-## `S4P_MNIST.visualization`
+## `s4p_mnist.visualization`
 
 ```python
-from S4P_MNIST.visualization import plot_training_history, plot_confusion_matrix
+from s4p_mnist.visualization import plot_training_history, plot_confusion_matrix
 ```
 
-## `S4P_MNIST.utils`
+## `s4p_mnist.utils`
 
 ```python
-from S4P_MNIST.utils import set_seed, save_json, load_json
+from s4p_mnist.utils import set_seed, save_json, load_json
 
 set_seed(42)
 ```
@@ -91,8 +91,8 @@ set_seed(42)
 ## Training / Prediction CLIs
 
 ```bash
-python -m S4P_MNIST.train_model --epochs 100 --batch-size 64
-python -m S4P_MNIST.predict_model --model-path models/model.joblib --input data/processed/test.csv
+python -m s4p_mnist.train_model --epochs 100 --batch-size 64
+python -m s4p_mnist.predict_model --model-path models/model.joblib --input data/processed/test.csv
 ```
 
 ## Hydra Configuration
@@ -100,9 +100,9 @@ python -m S4P_MNIST.predict_model --model-path models/model.joblib --input data/
 Configuration is managed through Hydra — see `configs/config.yaml` for defaults and override at runtime:
 
 ```bash
-python -m S4P_MNIST.train_model model.name=custom_model training.epochs=200
+python -m s4p_mnist.train_model model.name=custom_model training.epochs=200
 ```
 
 ---
 
-**S4P_MNIST** · Version see `S4P_MNIST.__version__`
+**s4p_mnist** · Version see `s4p_mnist.__version__`
