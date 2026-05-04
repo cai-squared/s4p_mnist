@@ -5,28 +5,28 @@
 - **Team Name:** S4P
 - **Team Members:** *Cai Cindy (ccai5@depaul.edu)*
                     *Riffa Hammed (rriffaha@depaul.edu)*
-                    *Sai Subodh Gundam Raju (sgundamr@depaul.edu)*
+                    *Sai Subodh Gundam Raju (sgundamr@dgepaul.edu)*
                     *Saumyaa Kannan (skannan3@depaul.edu)*
 - **Course & Section:** SE489 ML ENGINEERING FOR PRODUCTION
                         Section:(930 Online: Sync - 910 Online: Async)
 
 ## 🧠 Project Overview
 
-🚀 S4P MNIST is an end-to-end machine learning engineering project that designs, 
-trains, evaluates, and deploys a handwritten digit classifier on the MNIST dataset - 70,000 grayscale images of handwritten digits around 10 classes (0-9) across 60,000 training 
-and 10,000 test samples. The project goes beyond model accuracy, emphasizing 
-production-grade MLOps practices: reproducible data pipelines, experiment 
-tracking, containerization, continuous integration, and a live deployed 
-interface for real-time predictions. Built across three phases, S4P MNIST 
-demonstrates a complete ML project lifecycle from raw data ingestion through 
+🚀 S4P MNIST is an end-to-end machine learning engineering project that designs,
+trains, evaluates, and deploys a handwritten digit classifier on the MNIST dataset - 70,000 grayscale images of handwritten digits around 10 classes (0-9) across 60,000 training
+and 10,000 test samples. The project goes beyond model accuracy, emphasizing
+production-grade MLOps practices: reproducible data pipelines, experiment
+tracking, containerization, continuous integration, and a live deployed
+interface for real-time predictions. Built across three phases, S4P MNIST
+demonstrates a complete ML project lifecycle from raw data ingestion through
 to a scalable, monitored, and user-accessible deployment.
 
 🎯 **Key Objectives:**
-- [ ] 🔬 Design and train a high-accuracy digit classification model with fully 
+- [ ] 🔬 Design and train a high-accuracy digit classification model with fully
       reproducible data processing and experiment tracking
-- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools 
+- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
       to ensure consistent, scalable execution
-- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable 
+- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
 
 ## Architecture Diagram
@@ -109,20 +109,15 @@ make help
 - **matplotlib** >= 3.9.0 - Visualization
 - **tqdm** >= 4.66.0 - Progress bars
 - **pyyaml** >= 6.0 - Configuration files
+### Deep Learning (PyTorch)
+- **torch** >= 2.3.0 - PyTorch framework
 ### Experiment Tracking
-- **mlflow** >= 2.16.0 - MLflow experiment tracking
+- **wandb** >= 0.18.0 - Weights & Biases
 ### Configuration Management
 - **hydra-core** >= 1.3.0 - Hydra configuration framework
 - **omegaconf** >= 2.3.0 - Hierarchical configuration
 ### Data Version Control
 - **dvc** >= 3.55.0 - Data Version Control
-
-### Development Tools
-- **pytest** >= 8.0 - Testing framework
-- **pytest-cov** >= 5.0 - Code coverage
-- **ruff** >= 0.6.0 - Linting and formatting
-- **mypy** >= 1.11 - Static type checking
-- **pre-commit** >= 3.8 - Git hooks framework
 
 ## Project Structure
 
