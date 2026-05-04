@@ -11,7 +11,7 @@
 
 ### 2.1 Repository Setup
 
-The S4P_MNIST Github repository was created from a Cookiecutter template. The repository structure is detailed in the README.md under the Project Structure section. 
+The s4p_mnist Github repository was created from a Cookiecutter template. The repository structure is detailed in the README.md under the Project Structure section. 
 
 ### 2.2 Environment Setup
 

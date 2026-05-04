@@ -1,7 +1,7 @@
 # PHASE 3: Continuous Machine Learning (CML) & Deployment
 
 ## Overview
-Phase 3 implements continuous integration/continuous deployment (CI/CD) pipelines and productionizes S4P_MNIST on cloud infrastructure. This phase covers automated testing, containerized workflows, CML integration, and multi-platform deployment options including GCP, Cloud Run, and serverless functions.
+Phase 3 implements continuous integration/continuous deployment (CI/CD) pipelines and productionizes s4p_mnist on cloud infrastructure. This phase covers automated testing, containerized workflows, CML integration, and multi-platform deployment options including GCP, Cloud Run, and serverless functions.
 
 ---
 

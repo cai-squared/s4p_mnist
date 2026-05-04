@@ -1,5 +1,5 @@
 
-# Hydra configuration for S4P_MNIST
+# Hydra configuration for s4p_mnist
 
 defaults:
   - _self_
