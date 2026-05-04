@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import struct
 from pathlib import Path
-from typing import Final
+from typing import Final, TypeAlias
 
 import numpy as np
 import numpy.typing as npt
@@ -56,8 +56,8 @@ PROCESSED_Y_TEST: Final[str] = "y_test.npy"
 
 # Type aliases. ``npt.NDArray[np.uint8]`` keeps mypy honest about the dtype
 # we emit: anyone downstream who needs floats must cast explicitly.
-ImageArray = npt.NDArray[np.uint8]
-LabelArray = npt.NDArray[np.uint8]
+ImageArray: TypeAlias = npt.NDArray[np.uint8]
+LabelArray: TypeAlias = npt.NDArray[np.uint8]
 
 
 def _read_idx_images(path: Path) -> ImageArray:

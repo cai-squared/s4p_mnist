@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import pandas as pd
 from torchvision import datasets
 
 from s4p_mnist.config import DATA_DIR, DEFAULT_CONFIG, MODELS_DIR, PROCESSED_DATA_DIR
@@ -17,38 +16,11 @@ from s4p_mnist.utils.seed import set_seed
 logger = get_logger(__name__)
 
 
-def _norm_col(name: str) -> str:
-    return str(name).strip().lower()
-
-
-def _dataframe_to_xy(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
-    cols = list(df.columns)
-    label_col: str | None = None
-    for c in cols:
-        if _norm_col(c) in {"label", "y", "target"}:
-            label_col = c
-            break
-    if label_col is None:
-        raise ValueError(
-            "Training CSV needs a label column (label, y, or target) "
-            "plus pixel columns."
-        )
-    y = df[label_col].to_numpy(dtype=np.int64)
-    feat_cols = [c for c in cols if c != label_col]
-    x = df[feat_cols].to_numpy(dtype=np.float32)
-    return x, y
-
-
 def load_training_xy(
     data_path: Path,
     *,
     download: bool = True,
 ) -> tuple[np.ndarray, np.ndarray]:
-    train_csv = data_path / "train.csv"
-    if train_csv.is_file():
-        logger.info("Loading training arrays from %s", train_csv)
-        return _dataframe_to_xy(pd.read_csv(train_csv))
-
     try:
         X_train_img, y_train, _, _ = load_processed(data_path)
         x_arr = X_train_img.reshape(X_train_img.shape[0], -1).astype(
