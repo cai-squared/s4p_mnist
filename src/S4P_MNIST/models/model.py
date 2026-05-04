@@ -10,9 +10,9 @@ from torch import nn
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, TensorDataset
 
-from s4p_mnist.models.base import BaseModel
+from S4P_MNIST.models.base import BaseModel
 
-_BUNDLE_KIND = "s4p_mnist_torch_cnn_v1"
+_BUNDLE_KIND = "S4P_MNIST_torch_cnn_v1"
 
 
 class MnistConvNet(nn.Module):
@@ -202,7 +202,7 @@ class Model(BaseModel):
     def load(cls, path: Path) -> Model:
         blob: Any = joblib.load(path)
         if not isinstance(blob, dict) or blob.get("kind") != _BUNDLE_KIND:
-            raise TypeError("File is not a saved s4p_mnist CNN model bundle.")
+            raise TypeError("File is not a saved S4P_MNIST CNN model bundle.")
         cfg = blob.get("config") or {}
         model = cls(cfg if isinstance(cfg, dict) else {})
         state = blob.get("state_dict")

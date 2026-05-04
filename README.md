@@ -126,12 +126,12 @@ make help
 
 ## Project Structure
 
-This template uses the modern **`src/` layout** — the importable package lives in `src/s4p_mnist/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
+This template uses the modern **`src/` layout** — the importable package lives in `src/S4P_MNIST/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
 
 ```
-s4p_mnist/                  # Repository root
+S4P_MNIST/                  # Repository root
 ├── src/
-│   └── s4p_mnist/          # Importable Python package
+│   └── S4P_MNIST/          # Importable Python package
 │       ├── __init__.py                # Version + package metadata
 │       ├── config.py                  # Paths & typed config (PROJECT_ROOT, TrainingConfig, ...)
 │       ├── logging_config.py          # setup_logging() + get_logger()
@@ -201,7 +201,7 @@ s4p_mnist/                  # Repository root
 | Catches packaging bugs early | ✅ | ❌ |
 | Adopted by | attrs, httpx, pydantic, flask, sqlalchemy | Older data-science templates |
 
-Data and model artifacts are accessed via the constants in `s4p_mnist.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
+Data and model artifacts are accessed via the constants in `S4P_MNIST.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
 
 ## Common Commands
 
