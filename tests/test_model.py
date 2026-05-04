@@ -1,4 +1,4 @@
-﻿"""Tests for the MNIST CNN ``Model``."""
+"""Tests for the MNIST CNN ``Model``."""
 
 from __future__ import annotations
 
