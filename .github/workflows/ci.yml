@@ -44,7 +44,7 @@ jobs:
 
       - name: Type check with mypy
         run: |
-          mypy src
+          mypy src/S4P_MNIST
 
       - name: Run tests with pytest
         run: |

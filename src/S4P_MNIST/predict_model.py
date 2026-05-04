@@ -7,9 +7,9 @@ from typing import cast
 import numpy as np
 import pandas as pd
 
-from s4p_mnist.config import MODELS_DIR, PROCESSED_DATA_DIR
-from s4p_mnist.logging_config import get_logger, setup_logging
-from s4p_mnist.models.model import Model
+from S4P_MNIST.config import MODELS_DIR, PROCESSED_DATA_DIR
+from S4P_MNIST.logging_config import get_logger, setup_logging
+from S4P_MNIST.models.model import Model
 
 logger = get_logger(__name__)
 

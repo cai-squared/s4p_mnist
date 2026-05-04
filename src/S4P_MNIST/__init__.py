@@ -6,7 +6,7 @@ machine learning with MNIST
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("s4p_mnist")
+    __version__ = version("S4P_MNIST")
 except PackageNotFoundError:
     __version__ = "0.0.0+unknown"
 
