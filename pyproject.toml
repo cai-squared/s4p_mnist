@@ -44,8 +44,8 @@ extend-exclude = ["notebooks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "B", "UP"]
-# N999: template package dir is s4p_mnist (not lowercase). N803/N806: sklearn-style X, y, X_train.
-ignore = ["N999", "N803", "N806"]
+# N803/N806: sklearn-style X, y, X_train.
+ignore = ["N803", "N806"]
 
 [tool.mypy]
 python_version = "3.11"
