@@ -1,4 +1,4 @@
-# Getting Started with S4P_MNIST
+# Getting Started with s4p_mnist
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@
 
 ```bash
 git clone <repository-url>
-cd S4P_MNIST
+cd s4p_mnist
 ```
 
 ### Step 2: Create a Virtual Environment
@@ -26,8 +26,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 **Using conda:**
 ```bash
-conda create -n S4P_MNIST python=3.11
-conda activate S4P_MNIST
+conda create -n s4p_mnist python=3.11
+conda activate s4p_mnist
 ```
 
 ### Step 3: Install Dependencies
@@ -70,7 +70,7 @@ make data
 Or directly:
 
 ```bash
-python -m S4P_MNIST.data.make_dataset
+python -m s4p_mnist.data.make_dataset
 ```
 
 ### Model Training
@@ -84,7 +84,7 @@ make train
 With custom parameters:
 
 ```bash
-python -m S4P_MNIST.train_model --epochs 100 --batch-size 64
+python -m s4p_mnist.train_model --epochs 100 --batch-size 64
 ```
 
 ### Model Prediction
@@ -98,7 +98,7 @@ make predict
 With custom inputs:
 
 ```bash
-python -m S4P_MNIST.predict_model --model-path models/model.pkl --input data/test.csv
+python -m s4p_mnist.predict_model --model-path models/model.pkl --input data/test.csv
 ```
 
 ## Development Workflow
@@ -110,7 +110,7 @@ python -m S4P_MNIST.predict_model --model-path models/model.pkl --input data/tes
 make test
 
 # Run tests with coverage
-pytest tests/ --cov=S4P_MNIST
+pytest tests/ --cov=s4p_mnist
 
 # Run specific test file
 pytest tests/test_model.py -v
@@ -152,7 +152,7 @@ make docker_build
 Or manually:
 
 ```bash
-docker build -t S4P_MNIST -f dockerfiles/Dockerfile .
+docker build -t s4p_mnist -f dockerfiles/Dockerfile .
 ```
 
 ### Run with Docker Compose
@@ -170,9 +170,9 @@ make docker_run
 ## Project Structure
 
 ```
-S4P_MNIST/                  # Repository root
+s4p_mnist/                  # Repository root
 ├── src/
-│   └── S4P_MNIST/          # Importable package (src/ layout)
+│   └── s4p_mnist/          # Importable package (src/ layout)
 │       ├── config.py                  # Paths & typed config
 │       ├── logging_config.py
 │       ├── data/                      # Loaders + raw→processed pipeline
@@ -210,7 +210,7 @@ training:
 Override at runtime:
 
 ```bash
-python -m S4P_MNIST.train_model \
+python -m s4p_mnist.train_model \
   model.name=custom_model \
   training.epochs=200
 ```

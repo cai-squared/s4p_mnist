@@ -1,5 +1,5 @@
 
-# Multi-stage build for S4P_MNIST
+# Multi-stage build for s4p_mnist
 
 # Stage 1: Builder
 FROM python:3.11-slim as builder
@@ -29,4 +29,4 @@ RUN pip install --no-cache-dir -e .
 
 EXPOSE 8000
 
-ENTRYPOINT ["python", "-m", "S4P_MNIST.train_model"]
+ENTRYPOINT ["python", "-m", "s4p_mnist.train_model"]

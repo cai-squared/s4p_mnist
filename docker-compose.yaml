@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  S4P_MNIST:
+  s4p_mnist:
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile
-    container_name: S4P_MNIST_app
+    container_name: s4p_mnist_app
     volumes:
       - ./data:/app/data
       - ./models:/app/models

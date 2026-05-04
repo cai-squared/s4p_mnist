@@ -7,7 +7,7 @@ Phase 1 establishes the foundation for your MLOps project. This phase covers pro
 
 ## 1. Project Proposal
 
-- [ ] **Scope & Objectives**: Define the problem statement, goals, and success metrics for S4P_MNIST
+- [ ] **Scope & Objectives**: Define the problem statement, goals, and success metrics for s4p_mnist
 - [ ] **Detailed Description**: Write a 300+ word project description covering the business context, technical approach, and expected outcomes
 - [ ] **Dataset Selection**: Choose appropriate dataset(s) and document the selection justification
 - [ ] **Dataset Description**: Document dataset characteristics (size, features, format, sources)
