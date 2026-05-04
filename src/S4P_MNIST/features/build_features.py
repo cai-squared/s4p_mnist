@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from s4p_mnist.logging_config import get_logger
+from S4P_MNIST.logging_config import get_logger
 
 logger = get_logger(__name__)
 

@@ -6,8 +6,8 @@ Run via the project ``Makefile``::
 
 or directly::
 
-    python -m s4p_mnist.data.make_dataset
-    python -m s4p_mnist.data.make_dataset --force
+    python -m S4P_MNIST.data.make_dataset
+    python -m S4P_MNIST.data.make_dataset --force
 
 The pipeline reads the four IDX files from ``data/raw/``, performs minimal
 validation, and writes ``X_train.npy``, ``y_train.npy``, ``X_test.npy``,
@@ -23,8 +23,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from s4p_mnist.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
-from s4p_mnist.data.loaders import (
+from S4P_MNIST.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from S4P_MNIST.data.loaders import (
     PROCESSED_X_TEST,
     PROCESSED_X_TRAIN,
     PROCESSED_Y_TEST,
@@ -32,7 +32,7 @@ from s4p_mnist.data.loaders import (
     load_raw,
     save_processed,
 )
-from s4p_mnist.logging_config import get_logger, setup_logging
+from S4P_MNIST.logging_config import get_logger, setup_logging
 
 logger = get_logger(__name__)
 
@@ -61,10 +61,10 @@ def make_dataset(
     ----------
     raw_dir : Path, optional
         Directory containing the raw IDX files. Defaults to
-        :data:`s4p_mnist.config.RAW_DATA_DIR`.
+        :data:`S4P_MNIST.config.RAW_DATA_DIR`.
     processed_dir : Path, optional
         Output directory for processed ``.npy`` files. Defaults to
-        :data:`s4p_mnist.config.PROCESSED_DATA_DIR`.
+        :data:`S4P_MNIST.config.PROCESSED_DATA_DIR`.
     force : bool, default False
         If ``False`` (the default) and all four processed files already
         exist in ``processed_dir``, the pipeline logs a message and
@@ -98,7 +98,7 @@ def make_dataset(
 def _build_parser() -> argparse.ArgumentParser:
     """Build the argparse parser for the CLI."""
     parser = argparse.ArgumentParser(
-        prog="s4p_mnist.data.make_dataset",
+        prog="S4P_MNIST.data.make_dataset",
         description="Transform raw MNIST IDX files into processed NumPy arrays.",
     )
     parser.add_argument(
