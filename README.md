@@ -36,6 +36,54 @@ to a scalable, monitored, and user-accessible deployment.
 
 Insert your system architecture diagram here, showing data flow, components,
 and interactions between different parts of the system.
+
+flowchart TD
+    %% Data Layer
+    A[Raw MNIST Dataset<br/>70k IDX Binary Files] --> B[Data Pipeline<br/>make_dataset.py]
+
+    %% Processing Layer
+    B --> C[Processed Data<br/>NumPy Arrays in data/processed]
+    C --> D[Preprocessing Pipeline<br/>StandardScaler + PCA (100 Components)]
+
+    %% Model Training Layer
+    D --> E1[Logistic Regression<br/>~92% Accuracy]
+    D --> E2[KNN Classifier (k=5)<br/>~96% Accuracy]
+    D --> E3[SVM with RBF Kernel<br/>~97% Accuracy]
+    D --> E4[Random Forest (100 Trees)<br/>~94% Accuracy]
+    D --> E5[MLP Neural Network<br/>128 → 64 Layers<br/>~98% Accuracy]
+    D --> E6[CNN using PyTorch<br/>3 Convolution Blocks + BatchNorm]
+
+    %% Evaluation Layer
+    E1 --> F[Model Evaluation<br/>Accuracy · F1 Score · Confusion Matrix]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    E5 --> F
+    E6 --> F
+
+    %% Artifact Storage
+    F --> G[Saved Model Artifacts<br/>models/ Directory]
+
+    %% Deployment Layer
+    G --> H[FastAPI Service<br/>api/]
+    H --> I[Live Predictions<br/>Real-Time Digit Classification]
+
+    %% MLOps Infrastructure
+    J[GitHub Actions CI/CD<br/>.github/workflows/ci.yml] --> D
+    K[Docker Container<br/>dockerfiles/Dockerfile] --> H
+
+    %% Styling
+    classDef data fill:#E3F2FD,stroke:#1E88E5,color:#000;
+    classDef process fill:#E8F5E9,stroke:#43A047,color:#000;
+    classDef model fill:#FFF3E0,stroke:#FB8C00,color:#000;
+    classDef deploy fill:#F3E5F5,stroke:#8E24AA,color:#000;
+    classDef infra fill:#ECEFF1,stroke:#546E7A,color:#000;
+
+    class A,B,C,D data;
+    class E1,E2,E3,E4,E5,E6 model;
+    class F,G,H,I deploy;
+    class J,K infra;
+
 ```
 
 ## Phase Deliverables
