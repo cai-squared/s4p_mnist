@@ -251,7 +251,7 @@ make docs
 
 - **Cindy Cai** — Data exploration, EDA notebook, code review
 - **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
-- **Sai Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
+- **Sai Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 99.5% accuracy)
 - **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
 ---
 ## References
