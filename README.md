@@ -32,85 +32,23 @@ to a scalable, monitored, and user-accessible deployment.
 ## Architecture Diagram
 
 ```mermaid
-flowchart LR
-
-    %% =========================
-    %% DATA PIPELINE
-    %% =========================
-    subgraph Data_Pipeline
-        A[Raw MNIST Dataset<br/>IDX Binary Files]
-        B[make_dataset.py]
-        C[Processed NumPy Arrays<br/>data/processed]
-    end
-
-    A --> B --> C
-
-    %% =========================
-    %% PREPROCESSING
-    %% =========================
-    subgraph Preprocessing
-        D[StandardScaler]
-        E[PCA - 100 Components]
-    end
-
-    C --> D --> E
-
-    %% =========================
-    %% MODEL TRAINING
-    %% =========================
-    subgraph Model_Training
-        F1[Logistic Regression<br/>92%]
-        F2[KNN k=5<br/>96%]
-        F3[SVM RBF<br/>97%]
-        F4[Random Forest<br/>94%]
-        F5[MLP 128→64<br/>98%]
-        F6[CNN PyTorch<br/>3 Conv Blocks]
-    end
-
-    E --> F1
-    E --> F2
-    E --> F3
-    E --> F4
-    E --> F5
-    E --> F6
-
-    %% =========================
-    %% EVALUATION
-    %% =========================
-    subgraph Evaluation
-        G[Accuracy<br/>F1 Score<br/>Confusion Matrix]
-    end
-
-    F1 --> G
-    F2 --> G
-    F3 --> G
-    F4 --> G
-    F5 --> G
-    F6 --> G
-
-    %% =========================
-    %% DEPLOYMENT
-    %% =========================
-    subgraph Deployment
-        H[Saved Models<br/>models/]
-        I[FastAPI Service]
-        J[Live Predictions]
-    end
-
-    G --> H --> I --> J
-
-    %% =========================
-    %% MLOPS INFRASTRUCTURE
-    %% =========================
-    subgraph MLOps
-        K[GitHub Actions CI/CD]
-        L[Docker Container]
-    end
-
-    K --> F6
-    L --> I
+flowchart TD
+    A[Raw MNIST Data\n70k IDX binary files] --> B[Data Pipeline\nmake_dataset.py]
+    B --> C[Processed Data\n.npy arrays in data/processed/]
+    C --> D[Preprocessing\nStandardScaler + PCA 100 components]
+    D --> E1[Logistic Regression\n92% accuracy]
+    D --> E2[KNN k=5\n96% accuracy]
+    D --> E3[SVM RBF\n97% accuracy]
+    D --> E4[Random Forest 100 trees\n94% accuracy]
+    D --> E5[MLP 128→64\n98% accuracy]
+    D --> E6[CNN PyTorch\n3 Conv blocks + BatchNorm]
+    E1 & E2 & E3 & E4 & E5 & E6 --> F[Evaluation\nAccuracy / F1 / Confusion Matrix]
+    F --> G[Saved Model Artifacts\nmodels/]
+    G --> H[FastAPI Service\napi/]
+    H --> I[Live Predictions\nReal-time digit classification]
+    J[GitHub Actions CI/CD\n.github/workflows/ci.yml] --> D
+    K[Docker Container\ndockerfiles/Dockerfile] --> H
 ```
-
 ## Phase Deliverables
 
 ### Phase 1: Project Design & Model Development
