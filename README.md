@@ -31,14 +31,6 @@ to a scalable, monitored, and user-accessible deployment.
 
 ## Architecture Diagram
 
-```
-[Placeholder for architecture diagram]
-
-Insert your system architecture diagram here, showing data flow, components,
-and interactions between different parts of the system.
-
-## Architecture Diagram
-
 ```mermaid
 flowchart LR
 
@@ -117,7 +109,6 @@ flowchart LR
 
     K --> F6
     L --> I
-```
 ```
 
 ## Phase Deliverables
