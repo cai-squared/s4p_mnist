@@ -119,13 +119,13 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=cfg.epochs)
     parser.add_argument("--batch-size", type=int, default=cfg.batch_size)
     parser.add_argument("--learning-rate", type=float, default=cfg.learning_rate)
-    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument("--weight-decay", type=float, default=cfg.weight_decay)
     parser.add_argument(
         "--val-fraction",
         type=float,
         default=DEFAULT_CONFIG.data.val_split,
     )
-    parser.add_argument("--dropout", type=float, default=0.3)
+    parser.add_argument("--dropout", type=float, default=cfg.dropout)
     parser.add_argument("--seed", type=int, default=cfg.seed)
     args = parser.parse_args()
 

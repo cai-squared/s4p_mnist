@@ -41,7 +41,7 @@ flowchart TD
     D --> E3[SVM RBF\n97% accuracy]
     D --> E4[Random Forest 100 trees\n94% accuracy]
     D --> E5[MLP 128→64\n98% accuracy]
-    D --> E6[CNN PyTorch\n3 Conv blocks + BatchNorm]
+    E6[CNN PyTorch\n3 Conv blocks + BatchNorm]
     E1 & E2 & E3 & E4 & E5 & E6 --> F[Evaluation\nAccuracy / F1 / Confusion Matrix]
     F --> G[Saved Model Artifacts\nmodels/]
     G --> H[FastAPI Service\napi/]
