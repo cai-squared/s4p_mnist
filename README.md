@@ -214,26 +214,40 @@ Data and model artifacts are accessed via the constants in `s4p_mnist.config` (`
 ```bash
 # Install package + runtime dependencies (editable install)
 make install
+```
 
+```bash
 # Install dev tools + pre-commit hooks
 make dev
+```
 
+```bash
 # Run linting and formatting checks
 make lint
+```
 
+```bash
 # Auto-format code
 make format
+```
 
+```bash
 # Run tests
 make test
+```
 
+```bash
 # Clean up build artifacts
 make clean
+```
 
+```bash
 # Docker operations
 make docker_build
 make docker_run
+```
 
+```bash
 # Serve documentation locally
 make docs
 ```
@@ -242,7 +256,7 @@ make docs
 
 - **Cindy Cai** — Data exploration, EDA notebook, code review
 - **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
-- **Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
+- **Sai Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
 - **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
 
 ## References
