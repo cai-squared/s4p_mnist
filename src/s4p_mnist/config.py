@@ -27,6 +27,8 @@ class TrainingConfig:
     learning_rate: float = 1.2e-3
     seed: int = 42
     early_stopping_patience: int = 10
+    weight_decay: float = 1e-4
+    dropout: float = 0.3
 
 
 @dataclass(frozen=True)
