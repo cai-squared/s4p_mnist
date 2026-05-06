@@ -9,7 +9,7 @@
                     *Saumyaa Kannan (skannan3@depaul.edu)*
 - **Course & Section:** SE489 ML ENGINEERING FOR PRODUCTION
                         Section:(930 Online: Sync - 910 Online: Async)
-
+---
 ## 🧠 Project Overview
 
 🚀 S4P MNIST is an end-to-end machine learning engineering project that designs,
@@ -28,7 +28,7 @@ to a scalable, monitored, and user-accessible deployment.
       to ensure consistent, scalable execution
 - [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
-
+---
 ## Architecture Diagram
 
 ```mermaid
@@ -49,6 +49,7 @@ flowchart TD
     J[GitHub Actions CI/CD\n.github/workflows/ci.yml] --> D
     K[Docker Container\ndockerfiles/Dockerfile] --> H
 ```
+---
 ## Phase Deliverables
 
 ### Phase 1: Project Design & Model Development
@@ -60,7 +61,7 @@ flowchart TD
 
 ### Phase 3: CI/CD & Deployment
 - See [PHASE3.md](PHASE3.md) for detailed checklist
-
+---
 ## Setup Instructions
 
 ### Prerequisites
@@ -110,7 +111,7 @@ make predict
 # See all available commands
 make help
 ```
-
+---
 ## Technology Stack
 
 ### Core Dependencies
@@ -129,7 +130,7 @@ make help
 - **omegaconf** >= 2.3.0 - Hierarchical configuration
 ### Data Version Control
 - **dvc** >= 3.55.0 - Data Version Control
-
+---
 ## Project Structure
 
 This template uses the modern **`src/` layout** — the importable package lives in `src/s4p_mnist/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
@@ -251,21 +252,21 @@ make docker_run
 # Serve documentation locally
 make docs
 ```
-
+---
 ## Contribution Summary
 
 - **Cindy Cai** — Data exploration, EDA notebook, code review
 - **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
 - **Sai Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
 - **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
-
+---
 ## References
 
 - [Project Documentation](docs/index.md)
 - [Phase 1 — Project Design & Model Development](PHASE1.md)
 - [Phase 2 — Containerization & Monitoring](PHASE2.md)
 - [Phase 3 — CI/CD & Deployment](PHASE3.md)
-
+---
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
