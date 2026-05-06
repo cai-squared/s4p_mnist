@@ -40,7 +40,7 @@ flowchart TD
     F --> G[Saved Model Artifacts\nmodels/]
     G --> H[FastAPI Service\napi/]
     H --> I[Live Predictions\nReal-time digit classification]
-    J[GitHub Actions CI/CD\n.github/workflows/ci.yml] --> D
+    J[GitHub Actions CI/CD\n.github/workflows/ci.yml] --> E6
     K[Docker Container\ndockerfiles/Dockerfile] --> H
 ```
 ---
