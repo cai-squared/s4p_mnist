@@ -37,53 +37,87 @@ to a scalable, monitored, and user-accessible deployment.
 Insert your system architecture diagram here, showing data flow, components,
 and interactions between different parts of the system.
 
-flowchart TD
-    %% Data Layer
-    A[Raw MNIST Dataset<br/>70k IDX Binary Files] --> B[Data Pipeline<br/>make_dataset.py]
+## Architecture Diagram
 
-    %% Processing Layer
-    B --> C[Processed Data<br/>NumPy Arrays in data/processed]
-    C --> D[Preprocessing Pipeline<br/>StandardScaler + PCA (100 Components)]
+```mermaid
+flowchart LR
 
-    %% Model Training Layer
-    D --> E1[Logistic Regression<br/>~92% Accuracy]
-    D --> E2[KNN Classifier (k=5)<br/>~96% Accuracy]
-    D --> E3[SVM with RBF Kernel<br/>~97% Accuracy]
-    D --> E4[Random Forest (100 Trees)<br/>~94% Accuracy]
-    D --> E5[MLP Neural Network<br/>128 → 64 Layers<br/>~98% Accuracy]
-    D --> E6[CNN using PyTorch<br/>3 Convolution Blocks + BatchNorm]
+    %% =========================
+    %% DATA PIPELINE
+    %% =========================
+    subgraph Data_Pipeline
+        A[Raw MNIST Dataset<br/>IDX Binary Files]
+        B[make_dataset.py]
+        C[Processed NumPy Arrays<br/>data/processed]
+    end
 
-    %% Evaluation Layer
-    E1 --> F[Model Evaluation<br/>Accuracy · F1 Score · Confusion Matrix]
-    E2 --> F
-    E3 --> F
-    E4 --> F
-    E5 --> F
-    E6 --> F
+    A --> B --> C
 
-    %% Artifact Storage
-    F --> G[Saved Model Artifacts<br/>models/ Directory]
+    %% =========================
+    %% PREPROCESSING
+    %% =========================
+    subgraph Preprocessing
+        D[StandardScaler]
+        E[PCA - 100 Components]
+    end
 
-    %% Deployment Layer
-    G --> H[FastAPI Service<br/>api/]
-    H --> I[Live Predictions<br/>Real-Time Digit Classification]
+    C --> D --> E
 
-    %% MLOps Infrastructure
-    J[GitHub Actions CI/CD<br/>.github/workflows/ci.yml] --> D
-    K[Docker Container<br/>dockerfiles/Dockerfile] --> H
+    %% =========================
+    %% MODEL TRAINING
+    %% =========================
+    subgraph Model_Training
+        F1[Logistic Regression<br/>92%]
+        F2[KNN k=5<br/>96%]
+        F3[SVM RBF<br/>97%]
+        F4[Random Forest<br/>94%]
+        F5[MLP 128→64<br/>98%]
+        F6[CNN PyTorch<br/>3 Conv Blocks]
+    end
 
-    %% Styling
-    classDef data fill:#E3F2FD,stroke:#1E88E5,color:#000;
-    classDef process fill:#E8F5E9,stroke:#43A047,color:#000;
-    classDef model fill:#FFF3E0,stroke:#FB8C00,color:#000;
-    classDef deploy fill:#F3E5F5,stroke:#8E24AA,color:#000;
-    classDef infra fill:#ECEFF1,stroke:#546E7A,color:#000;
+    E --> F1
+    E --> F2
+    E --> F3
+    E --> F4
+    E --> F5
+    E --> F6
 
-    class A,B,C,D data;
-    class E1,E2,E3,E4,E5,E6 model;
-    class F,G,H,I deploy;
-    class J,K infra;
+    %% =========================
+    %% EVALUATION
+    %% =========================
+    subgraph Evaluation
+        G[Accuracy<br/>F1 Score<br/>Confusion Matrix]
+    end
 
+    F1 --> G
+    F2 --> G
+    F3 --> G
+    F4 --> G
+    F5 --> G
+    F6 --> G
+
+    %% =========================
+    %% DEPLOYMENT
+    %% =========================
+    subgraph Deployment
+        H[Saved Models<br/>models/]
+        I[FastAPI Service]
+        J[Live Predictions]
+    end
+
+    G --> H --> I --> J
+
+    %% =========================
+    %% MLOPS INFRASTRUCTURE
+    %% =========================
+    subgraph MLOps
+        K[GitHub Actions CI/CD]
+        L[Docker Container]
+    end
+
+    K --> F6
+    L --> I
+```
 ```
 
 ## Phase Deliverables
