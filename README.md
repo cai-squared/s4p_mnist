@@ -52,6 +52,7 @@ flowchart TD
 
 ### Phase 2: Containerization & Monitoring
 - See [PHASE2.md](PHASE2.md) for detailed checklist
+- See [docs/PHASE2.md](docs/PHASE2.md) for phase documentation.
 
 ### Phase 3: CI/CD & Deployment
 - See [PHASE3.md](PHASE3.md) for detailed checklist

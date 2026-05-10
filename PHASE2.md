@@ -1,5 +1,7 @@
 # PHASE 2: Enhancing ML Operations with Containerization & Monitoring
 
+**For documentation on phase 2, see [docs/PHASE2.md](docs/PHASE2.md).**
+
 ## Overview
 Phase 2 focuses on scaling and operationalizing s4p_mnist by implementing containerization, advanced monitoring, profiling, experiment tracking, and comprehensive logging. This phase ensures your model can be reliably deployed, monitored in production, and continuously improved through systematic experimentation.
 
