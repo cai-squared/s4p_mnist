@@ -1,64 +1,32 @@
-# Phase 2: Model Development
+# PHASE 2: Enhancing ML Operations with Containerization & Monitoring
 
 ## Overview
 This phase focuses on building, training, and validating machine learning models.
 
-## Objectives
+## 1. Containerization
 
-- [ ] Implement baseline model
-- [ ] Train and evaluate initial models
-- [ ] Hyperparameter tuning
-- [ ] Cross-validation and performance analysis
-- [ ] Model comparison and selection
+docker - Cindy
 
-## Deliverables
+## 2. Monitoring & Debugging
 
-### 1. Model Implementation
-- Model architecture defined
-- Training pipeline implemented
-- Evaluation metrics chosen
-- Baseline performance established
+W&B, PDB, IPDB - Riffa
 
-### 2. Experiment Tracking
-- All experiments logged and documented
-- Weights & Biases integration set up
+## 3. Profiling & Optimization
 
-### 3. Performance Analysis
-- Model comparison results
-- Hyperparameter sensitivity analysis
-- Feature importance analysis
-- Error analysis and patterns
+cProfile, PyTorch Profiler - Cindy
 
-### 4. Model Artifacts
-- Best model saved and versioned
-- Model evaluation report
-- Training curves and visualizations
-- Configuration documentation
+## 4. Experiment Management & Tracking
 
-## Model Selection
+W&B - Riffa
 
-*To be filled in during Phase 2*
+## 5. Application & Experiment Logging
 
-### Chosen Model
-- Model Type: 
-- Best Hyperparameters: 
-- Performance Metrics: 
+logging - Saumyaa
 
-## Key Results
+## 6. Configuration Management
 
-*To be filled in during Phase 2*
+Hydra - Subodh
 
-## Challenges and Solutions
+## 7. Documentation & Repository Updates
 
-*To be filled in during Phase 2*
-
-## Next Steps
-
-Move to Phase 3 once model is selected and meets performance requirements.
-
-## Status
-
-- Start Date: 
-- Estimated Completion: 
-- Actual Completion: 
-- Status: Not Started
+Saumyaa
