@@ -45,7 +45,10 @@ docker_build:
 	docker build -t s4p_mnist -f dockerfiles/Dockerfile .
 
 docker_run:
-	docker run --rm s4p_mnist
+	docker run -it --rm \
+		-v "$(PWD)/data:/app/data" \
+		-v "$(PWD)/models:/app/models" \
+		s4p_mnist:latest
 
 docs:
 	mkdocs serve
