@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 from torchvision import datasets
 
+import wandb
 from s4p_mnist.config import DATA_DIR, DEFAULT_CONFIG, MODELS_DIR, PROCESSED_DATA_DIR
 from s4p_mnist.data.loaders import load_processed
 from s4p_mnist.logging_config import get_logger, setup_logging
@@ -58,6 +60,7 @@ def train(
     val_fraction: float,
     weight_decay: float,
     dropout: float,
+    use_wandb: bool = True,
 ) -> None:
     model_dir.mkdir(parents=True, exist_ok=True)
     x_train, y_train = load_training_xy(data_path, download=True)
@@ -78,6 +81,16 @@ def train(
         "val_fraction": val_fraction,
         "seed": seed,
     }
+
+    wandb_mode = "online" if use_wandb else "disabled"
+    run = wandb.init(
+        project=os.environ.get("WANDB_PROJECT", "s4p-mnist"),
+        config=cfg,
+        job_type="train",
+        mode=wandb_mode,
+    )
+    logger.info("W&B run initialized: mode=%s name=%s", wandb_mode, run.name)
+
     model = Model(cfg)
     model.fit(x_train, y_train)
 
@@ -110,6 +123,21 @@ def train(
     logger.info("Held-out MNIST test accuracy: %.6f", acc)
     print(f"cnn_mnist_test_accuracy={acc:.6f}")
 
+    wandb.log({"test_accuracy": acc})
+    wandb.summary["test_accuracy"] = acc
+
+    artifact = wandb.Artifact(
+        name="s4p-mnist-model",
+        type="model",
+        description="Trained CNN on MNIST",
+        metadata={"test_accuracy": acc, **cfg},
+    )
+    artifact.add_file(str(out_path))
+    run.log_artifact(artifact)
+
+    run.finish()
+    logger.info("W&B run finished")
+
 
 def main() -> None:
     cfg = DEFAULT_CONFIG.training
@@ -127,6 +155,11 @@ def main() -> None:
     )
     parser.add_argument("--dropout", type=float, default=cfg.dropout)
     parser.add_argument("--seed", type=int, default=cfg.seed)
+    parser.add_argument(
+        "--no-wandb",
+        action="store_true",
+        help="Disable Weights & Biases logging for this run.",
+    )
     args = parser.parse_args()
 
     setup_logging()
@@ -142,6 +175,7 @@ def main() -> None:
         val_fraction=args.val_fraction,
         weight_decay=args.weight_decay,
         dropout=args.dropout,
+        use_wandb=not args.no_wandb,
     )
     logger.info("Training complete")
 
