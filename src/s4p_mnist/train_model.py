@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import wandb
 from torchvision import datasets
 
-import wandb
 from s4p_mnist.config import DATA_DIR, DEFAULT_CONFIG, MODELS_DIR, PROCESSED_DATA_DIR
 from s4p_mnist.data.loaders import load_processed
 from s4p_mnist.logging_config import get_logger, setup_logging
