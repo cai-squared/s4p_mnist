@@ -3,12 +3,12 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
-import wandb
 from torchvision import datasets
 
+import wandb
 from s4p_mnist.config import DATA_DIR, DEFAULT_CONFIG, MODELS_DIR, PROCESSED_DATA_DIR
 from s4p_mnist.data.loaders import load_processed
 from s4p_mnist.logging_config import get_logger, setup_logging
@@ -82,7 +82,7 @@ def train(
         "seed": seed,
     }
 
-    wandb_mode = "online" if use_wandb else "disabled"
+    wandb_mode: Literal["online", "disabled"] = "online" if use_wandb else "disabled"
     run = wandb.init(
         project=os.environ.get("WANDB_PROJECT", "s4p-mnist"),
         config=cfg,
