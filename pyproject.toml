@@ -47,6 +47,9 @@ select = ["E", "F", "I", "N", "W", "B", "UP"]
 # N803/N806: sklearn-style X, y, X_train.
 ignore = ["N803", "N806"]
 
+[tool.ruff.lint.isort]
+known-third-party = ["wandb", "numpy", "torch", "torchvision", "hydra", "omegaconf"]
+
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true

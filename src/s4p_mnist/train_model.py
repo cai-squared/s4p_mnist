@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import argparse
+import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import hydra
 import numpy as np
+import wandb
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets
 
@@ -96,6 +99,7 @@ def train(
     val_fraction: float,
     weight_decay: float,
     dropout: float,
+    use_wandb: bool = True,
 ) -> None:
     model_dir.mkdir(parents=True, exist_ok=True)
     x_train, y_train = load_training_xy(data_path, download=True)
@@ -116,6 +120,16 @@ def train(
         "val_fraction": val_fraction,
         "seed": seed,
     }
+
+    wandb_mode: Literal["online", "disabled"] = "online" if use_wandb else "disabled"
+    run = wandb.init(
+        project=os.environ.get("WANDB_PROJECT", "s4p-mnist"),
+        config=cfg,
+        job_type="train",
+        mode=wandb_mode,
+    )
+    logger.info("W&B run initialized: mode=%s name=%s", wandb_mode, run.name)
+
     model = Model(cfg)
     model.fit(x_train, y_train)
 
@@ -147,6 +161,21 @@ def train(
     acc = float((pred == y_test).mean())
     logger.info("Held-out MNIST test accuracy: %.6f", acc)
     print(f"cnn_mnist_test_accuracy={acc:.6f}")
+
+    wandb.log({"test_accuracy": acc})
+    wandb.summary["test_accuracy"] = acc
+
+    artifact = wandb.Artifact(
+        name="s4p-mnist-model",
+        type="model",
+        description="Trained CNN on MNIST",
+        metadata={"test_accuracy": acc, **cfg},
+    )
+    artifact.add_file(str(out_path))
+    run.log_artifact(artifact)
+
+    run.finish()
+    logger.info("W&B run finished")
 
 
 def _resolve_under_root(rel: str) -> Path:
