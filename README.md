@@ -106,6 +106,21 @@ make predict
 # See all available commands
 make help
 ```
+
+### Configuration (Hydra — Phase 2)
+
+The professor wanted Hydra for Part F, so train and predict both read `configs/config.yaml` (the file that was already in the template). Same file holds CNN training settings and the `predict:` paths, which keeps the repo simple.
+
+```bash
+make train
+python -m s4p_mnist.train_model training.epochs=3 training.batch_size=256
+python -m s4p_mnist.predict_model predict.output_file=out/preds.csv
+```
+
+If you typo something like `training.epochs=0`, it errors out immediately instead of halfway through an epoch loop.
+
+More detail is in `configs/README.md` and `docs/PHASE2.md` section 6.
+
 ---
 ## Technology Stack
 
@@ -252,7 +267,7 @@ make docs
 
 - **Cindy Cai** — Data exploration, EDA notebook, code review
 - **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
-- **Sai Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 99.5% accuracy)
+- **Sai Subodh Gundam Raju** — Model development and training (six algorithms including CNN, ~99.5% accuracy); Hydra config for training and prediction CLIs (Phase 2)
 - **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
 ---
 ## References
