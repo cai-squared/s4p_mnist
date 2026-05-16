@@ -1,31 +1,31 @@
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
-from typing import cast
 
-import numpy as np
+import hydra
 import pandas as pd
+from omegaconf import DictConfig, OmegaConf
 
-from S4P_MNIST.config import MODELS_DIR, PROCESSED_DATA_DIR
-from S4P_MNIST.logging_config import get_logger, setup_logging
-from S4P_MNIST.models.model import Model
+from s4p_mnist.config import PROJECT_ROOT
+from s4p_mnist.data.loaders import load_processed
+from s4p_mnist.logging_config import get_logger, setup_logging
+from s4p_mnist.models.model import Model
 
 logger = get_logger(__name__)
 
 
-def _build_feature_matrix(df: pd.DataFrame) -> np.ndarray:
-    drop = {"label", "y", "target"}
-    cols = [c for c in df.columns if str(c).strip().lower() not in drop]
-    if not cols:
-        raise ValueError("Input CSV has no feature columns after removing labels.")
-    x = df[cols].to_numpy(dtype=np.float32)
-    if x.shape[1] != 784:
-        logger.warning(
-            "Expected 784 pixel columns; got %d. Predictions may be wrong.",
-            x.shape[1],
-        )
-    return cast(np.ndarray, x)
+def _check_predict_cfg(cfg: DictConfig) -> None:
+    if not OmegaConf.is_config(cfg):
+        raise TypeError("cfg must be an OmegaConf config")
+    if "predict" not in cfg:
+        raise ValueError("predict section is required in config")
+    p = cfg.predict
+    for key in ("model_file", "input_dir", "output_file"):
+        if key not in p or not str(p[key]).strip():
+            raise ValueError(f"predict.{key} must be a non-empty string")
+    out = Path(str(p.output_file))
+    if out.exists() and out.is_dir():
+        raise ValueError("predict.output_file must be a file path, not a directory")
 
 
 def predict(model_path: Path, input_path: Path, output_path: Path) -> None:
@@ -33,9 +33,8 @@ def predict(model_path: Path, input_path: Path, output_path: Path) -> None:
     model = Model.load(model_path)
 
     logger.info("Scoring %s", input_path)
-    df = pd.read_csv(input_path)
-    x = _build_feature_matrix(df)
-    preds = model.predict(x)
+    _, _, X_test_img, y_test_u8 = load_processed(input_path)
+    preds = model.predict(X_test_img)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     out = pd.DataFrame({"prediction": preds})
@@ -43,19 +42,22 @@ def predict(model_path: Path, input_path: Path, output_path: Path) -> None:
     logger.info("Wrote %d rows to %s", len(out), output_path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model-path", type=Path, default=MODELS_DIR / "model.joblib")
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=PROCESSED_DATA_DIR / "input.csv",
-    )
-    parser.add_argument("--output", type=Path, default=Path("predictions.csv"))
-    args = parser.parse_args()
+def _resolve_under_root(rel: str) -> Path:
+    p = Path(rel)
+    return p if p.is_absolute() else (PROJECT_ROOT / p)
 
+
+@hydra.main(version_base=None, config_path="../../configs", config_name="config")
+def main(cfg: DictConfig) -> None:
+    _check_predict_cfg(cfg)
     setup_logging()
-    predict(args.model_path, args.input, args.output)
+
+    p = cfg.predict
+    model_path = _resolve_under_root(str(p.model_file))
+    input_path = _resolve_under_root(str(p.input_dir))
+    output_path = _resolve_under_root(str(p.output_file))
+
+    predict(model_path, input_path, output_path)
     logger.info("Prediction complete")
 
 

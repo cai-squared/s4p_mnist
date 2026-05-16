@@ -1,42 +1,57 @@
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 from typing import Any
 
+import hydra
 import numpy as np
-import pandas as pd
+from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets
 
-from S4P_MNIST.config import DATA_DIR, DEFAULT_CONFIG, MODELS_DIR, PROCESSED_DATA_DIR
-from S4P_MNIST.data.loaders import load_processed
-from S4P_MNIST.logging_config import get_logger, setup_logging
-from S4P_MNIST.models.model import Model
-from S4P_MNIST.utils.seed import set_seed
+from s4p_mnist.config import DATA_DIR, PROJECT_ROOT
+from s4p_mnist.data.loaders import load_processed
+from s4p_mnist.logging_config import get_logger, setup_logging
+from s4p_mnist.models.model import Model
+from s4p_mnist.utils.seed import set_seed
 
 logger = get_logger(__name__)
 
 
-def _norm_col(name: str) -> str:
-    return str(name).strip().lower()
-
-
-def _dataframe_to_xy(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
-    cols = list(df.columns)
-    label_col: str | None = None
-    for c in cols:
-        if _norm_col(c) in {"label", "y", "target"}:
-            label_col = c
-            break
-    if label_col is None:
-        raise ValueError(
-            "Training CSV needs a label column (label, y, or target) "
-            "plus pixel columns."
-        )
-    y = df[label_col].to_numpy(dtype=np.int64)
-    feat_cols = [c for c in cols if c != label_col]
-    x = df[feat_cols].to_numpy(dtype=np.float32)
-    return x, y
+def _check_train_cfg(cfg: DictConfig) -> None:
+    if not OmegaConf.is_config(cfg):
+        raise TypeError("cfg must be an OmegaConf config")
+    t = cfg.training
+    d = cfg.data
+    p = cfg.paths
+    keys = (
+        "epochs",
+        "batch_size",
+        "learning_rate",
+        "weight_decay",
+        "dropout",
+        "seed",
+    )
+    for key in keys:
+        if key not in t:
+            raise ValueError(f"training.{key} is required")
+    if int(t.epochs) < 1:
+        raise ValueError("training.epochs must be at least 1")
+    if int(t.batch_size) < 1:
+        raise ValueError("training.batch_size must be at least 1")
+    if float(t.learning_rate) <= 0:
+        raise ValueError("training.learning_rate must be positive")
+    if float(t.weight_decay) < 0:
+        raise ValueError("training.weight_decay cannot be negative")
+    if not 0 <= float(t.dropout) <= 1:
+        raise ValueError("training.dropout must be between 0 and 1")
+    if "val_fraction" not in d:
+        raise ValueError("data.val_fraction is required")
+    vf = float(d.val_fraction)
+    if not 0 < vf < 1:
+        raise ValueError("data.val_fraction must be strictly between 0 and 1")
+    for key in ("data_processed", "models_dir"):
+        if key not in p or not str(p[key]).strip():
+            raise ValueError(f"paths.{key} must be a non-empty string")
 
 
 def load_training_xy(
@@ -44,11 +59,6 @@ def load_training_xy(
     *,
     download: bool = True,
 ) -> tuple[np.ndarray, np.ndarray]:
-    train_csv = data_path / "train.csv"
-    if train_csv.is_file():
-        logger.info("Loading training arrays from %s", train_csv)
-        return _dataframe_to_xy(pd.read_csv(train_csv))
-
     try:
         X_train_img, y_train, _, _ = load_processed(data_path)
         x_arr = X_train_img.reshape(X_train_img.shape[0], -1).astype(
@@ -139,37 +149,33 @@ def train(
     print(f"cnn_mnist_test_accuracy={acc:.6f}")
 
 
-def main() -> None:
-    cfg = DEFAULT_CONFIG.training
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--data-path", type=Path, default=PROCESSED_DATA_DIR)
-    parser.add_argument("--model-dir", type=Path, default=MODELS_DIR)
-    parser.add_argument("--epochs", type=int, default=cfg.epochs)
-    parser.add_argument("--batch-size", type=int, default=cfg.batch_size)
-    parser.add_argument("--learning-rate", type=float, default=cfg.learning_rate)
-    parser.add_argument("--weight-decay", type=float, default=1e-4)
-    parser.add_argument(
-        "--val-fraction",
-        type=float,
-        default=DEFAULT_CONFIG.data.val_split,
-    )
-    parser.add_argument("--dropout", type=float, default=0.3)
-    parser.add_argument("--seed", type=int, default=cfg.seed)
-    args = parser.parse_args()
+def _resolve_under_root(rel: str) -> Path:
+    p = Path(rel)
+    return p if p.is_absolute() else (PROJECT_ROOT / p)
 
+
+@hydra.main(version_base=None, config_path="../../configs", config_name="config")
+def main(cfg: DictConfig) -> None:
+    _check_train_cfg(cfg)
     setup_logging()
-    set_seed(args.seed)
+
+    data_path = _resolve_under_root(str(cfg.paths.data_processed))
+    model_dir = _resolve_under_root(str(cfg.paths.models_dir))
+    t = cfg.training
+    d = cfg.data
+
+    set_seed(int(t.seed))
 
     train(
-        args.data_path,
-        args.model_dir,
-        args.epochs,
-        args.batch_size,
-        args.learning_rate,
-        seed=args.seed,
-        val_fraction=args.val_fraction,
-        weight_decay=args.weight_decay,
-        dropout=args.dropout,
+        data_path,
+        model_dir,
+        int(t.epochs),
+        int(t.batch_size),
+        float(t.learning_rate),
+        seed=int(t.seed),
+        val_fraction=float(d.val_fraction),
+        weight_decay=float(t.weight_decay),
+        dropout=float(t.dropout),
     )
     logger.info("Training complete")
 
