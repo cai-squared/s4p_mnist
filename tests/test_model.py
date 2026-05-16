@@ -7,9 +7,12 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pytest
+from omegaconf import OmegaConf
 
-from S4P_MNIST.models.base import BaseModel
-from S4P_MNIST.models.model import Model
+from s4p_mnist import predict_model as predict_mod
+from s4p_mnist import train_model as train_mod
+from s4p_mnist.models.base import BaseModel
+from s4p_mnist.models.model import Model
 
 
 class TestModel:
@@ -68,3 +71,56 @@ class TestModel:
 
         with pytest.raises(TypeError):
             Model.load(path)
+
+
+def _train_hydra_cfg() -> object:
+    return OmegaConf.create(
+        {
+            "paths": {"data_processed": "data/processed", "models_dir": "models"},
+            "data": {"val_fraction": 0.1},
+            "training": {
+                "epochs": 18,
+                "batch_size": 128,
+                "learning_rate": 0.001,
+                "weight_decay": 1e-4,
+                "dropout": 0.3,
+                "seed": 42,
+            },
+            "predict": {
+                "model_file": "models/model.joblib",
+                "input_dir": "data/processed",
+                "output_file": "predictions.csv",
+            },
+        }
+    )
+
+
+class TestHydraConfigChecks:
+    def test_train_cfg_ok(self) -> None:
+        train_mod._check_train_cfg(_train_hydra_cfg())
+
+    @pytest.mark.parametrize(
+        "path,val",
+        [
+            ("training.epochs", 0),
+            ("training.batch_size", 0),
+            ("training.learning_rate", 0.0),
+            ("training.weight_decay", -1.0),
+            ("training.dropout", 1.5),
+            ("data.val_fraction", 0.0),
+            ("data.val_fraction", 1.0),
+        ],
+    )
+    def test_train_cfg_rejects_bad_numbers(self, path: str, val: object) -> None:
+        cfg = _train_hydra_cfg()
+        OmegaConf.update(cfg, path, val, merge=True)
+        with pytest.raises(ValueError):
+            train_mod._check_train_cfg(cfg)
+
+    def test_predict_cfg_ok(self) -> None:
+        predict_mod._check_predict_cfg(_train_hydra_cfg())
+
+    def test_predict_cfg_requires_section(self) -> None:
+        cfg = OmegaConf.create({"paths": {}, "data": {}, "training": {}})
+        with pytest.raises(ValueError):
+            predict_mod._check_predict_cfg(cfg)

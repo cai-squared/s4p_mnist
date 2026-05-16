@@ -1,23 +1,13 @@
-# Configs Directory
+# Configs
 
-Store Hydra configuration files and experiment configurations here.
+This folder is what Hydra reads. There is only one yaml we use day to day, `config.yaml`, and it covers both training the CNN and running batch prediction.
 
-## Structure
-
-Organize configs by component:
-- `model/` — Model architecture and hyperparameters
-- `data/` — Data loading and preprocessing configs
-- `training/` — Training loops and optimization settings
-- `experiment/` — Full experiment configurations
-
-## Usage
-
-Hydra automatically loads configs from this directory. Override values via command line:
+`training`, `data`, and `paths` are for the train script. `predict` tells the predict script where the joblib file is, where the processed tensors live, and what csv to write. Paths are from the repo root unless you paste in an absolute path.
 
 ```bash
-python train.py model=bert data.batch_size=32
+python -m s4p_mnist.train_model
+python -m s4p_mnist.train_model training.epochs=4 training.batch_size=256
+python -m s4p_mnist.predict_model predict.output_file=tmp/preds.csv
 ```
 
-## Phase
-
-Phase 2 deliverable — Experiment configuration framework.
+Hydra merges yaml plus anything you pass on the command line, then the scripts validate before doing work.
