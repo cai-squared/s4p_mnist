@@ -5,39 +5,45 @@
 - **Team Name:** S4P
 - **Team Members:** *Cai Cindy (ccai5@depaul.edu)*
                     *Riffa Hammed (rriffaha@depaul.edu)*
-                    *Sai Subodh Gundam Raju (sgundamr@depaul.edu)*
+                    *Sai Subodh Gundam Raju (sgundamr@dgepaul.edu)*
                     *Saumyaa Kannan (skannan3@depaul.edu)*
 - **Course & Section:** SE489 ML ENGINEERING FOR PRODUCTION
                         Section:(930 Online: Sync - 910 Online: Async)
-
+---
 ## 🧠 Project Overview
 
-🚀 S4P MNIST is an end-to-end machine learning engineering project that designs, 
-trains, evaluates, and deploys a handwritten digit classifier on the MNIST dataset - 70,000 grayscale images of handwritten digits around 10 classes (0-9) across 60,000 training 
-and 10,000 test samples. The project goes beyond model accuracy, emphasizing 
-production-grade MLOps practices: reproducible data pipelines, experiment 
-tracking, containerization, continuous integration, and a live deployed 
-interface for real-time predictions. Built across three phases, S4P MNIST 
-demonstrates a complete ML project lifecycle from raw data ingestion through 
+🚀 S4P MNIST is an end-to-end machine learning engineering project that designs,
+trains, evaluates, and deploys a handwritten digit classifier on the MNIST dataset - 70,000 grayscale images of handwritten digits around 10 classes (0-9) across 60,000 training
+and 10,000 test samples. The project goes beyond model accuracy, emphasizing
+production-grade MLOps practices: reproducible data pipelines, experiment
+tracking, containerization, continuous integration, and a live deployed
+interface for real-time predictions. Built across three phases, S4P MNIST
+demonstrates a complete ML project lifecycle from raw data ingestion through
 to a scalable, monitored, and user-accessible deployment.
 
 🎯 **Key Objectives:**
-- [ ] 🔬 Design and train a high-accuracy digit classification model with fully 
+- [ ] 🔬 Design and train a high-accuracy digit classification model with fully
       reproducible data processing and experiment tracking
-- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools 
+- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
       to ensure consistent, scalable execution
-- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable 
+- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
-
+---
 ## Architecture Diagram
 
+```mermaid
+flowchart TD
+    A[Raw MNIST Data\n70k IDX binary files] --> B[Data Pipeline\nmake_dataset.py]
+    B --> C[Processed Data\n.npy arrays in data/processed/]
+    C --> E6[CNN PyTorch\n3 Conv blocks + BatchNorm]
+    E6 --> F[Evaluation\nAccuracy / F1 / Confusion Matrix]
+    F --> G[Saved Model Artifacts\nmodels/]
+    G --> H[FastAPI Service\napi/]
+    H --> I[Live Predictions\nReal-time digit classification]
+    J[GitHub Actions CI/CD\n.github/workflows/ci.yml] --> E6
+    K[Docker Container\ndockerfiles/Dockerfile] --> H
 ```
-[Placeholder for architecture diagram]
-
-Insert your system architecture diagram here, showing data flow, components,
-and interactions between different parts of the system.
-```
-
+---
 ## Phase Deliverables
 
 ### Phase 1: Project Design & Model Development
@@ -46,10 +52,11 @@ and interactions between different parts of the system.
 
 ### Phase 2: Containerization & Monitoring
 - See [PHASE2.md](PHASE2.md) for detailed checklist
+- See [docs/PHASE2.md](docs/PHASE2.md) for phase documentation.
 
 ### Phase 3: CI/CD & Deployment
 - See [PHASE3.md](PHASE3.md) for detailed checklist
-
+---
 ## Setup Instructions
 
 ### Prerequisites
@@ -100,6 +107,21 @@ make predict
 make help
 ```
 
+### Configuration (Hydra — Phase 2)
+
+The professor wanted Hydra for Part F, so train and predict both read `configs/config.yaml` (the file that was already in the template). Same file holds CNN training settings and the `predict:` paths, which keeps the repo simple.
+
+```bash
+make train
+python -m s4p_mnist.train_model training.epochs=3 training.batch_size=256
+python -m s4p_mnist.predict_model predict.output_file=out/preds.csv
+```
+
+If you typo something like `training.epochs=0`, it errors out immediately instead of halfway through an epoch loop.
+
+More detail is in `configs/README.md` and `docs/PHASE2.md` section 6.
+
+---
 ## Technology Stack
 
 ### Core Dependencies
@@ -109,29 +131,24 @@ make help
 - **matplotlib** >= 3.9.0 - Visualization
 - **tqdm** >= 4.66.0 - Progress bars
 - **pyyaml** >= 6.0 - Configuration files
+### Deep Learning (PyTorch)
+- **torch** >= 2.3.0 - PyTorch framework
 ### Experiment Tracking
-- **mlflow** >= 2.16.0 - MLflow experiment tracking
+- **wandb** >= 0.18.0 - Weights & Biases
 ### Configuration Management
 - **hydra-core** >= 1.3.0 - Hydra configuration framework
 - **omegaconf** >= 2.3.0 - Hierarchical configuration
 ### Data Version Control
 - **dvc** >= 3.55.0 - Data Version Control
-
-### Development Tools
-- **pytest** >= 8.0 - Testing framework
-- **pytest-cov** >= 5.0 - Code coverage
-- **ruff** >= 0.6.0 - Linting and formatting
-- **mypy** >= 1.11 - Static type checking
-- **pre-commit** >= 3.8 - Git hooks framework
-
+---
 ## Project Structure
 
-This template uses the modern **`src/` layout** — the importable package lives in `src/S4P_MNIST/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
+This template uses the modern **`src/` layout** — the importable package lives in `src/s4p_mnist/`, decoupled from the repository root. That forces `pip install -e .` before imports work, which catches packaging bugs early.
 
 ```
-S4P_MNIST/                  # Repository root
+s4p_mnist/                  # Repository root
 ├── src/
-│   └── S4P_MNIST/          # Importable Python package
+│   └── s4p_mnist/          # Importable Python package
 │       ├── __init__.py                # Version + package metadata
 │       ├── config.py                  # Paths & typed config (PROJECT_ROOT, TrainingConfig, ...)
 │       ├── logging_config.py          # setup_logging() + get_logger()
@@ -201,51 +218,65 @@ S4P_MNIST/                  # Repository root
 | Catches packaging bugs early | ✅ | ❌ |
 | Adopted by | attrs, httpx, pydantic, flask, sqlalchemy | Older data-science templates |
 
-Data and model artifacts are accessed via the constants in `S4P_MNIST.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
+Data and model artifacts are accessed via the constants in `s4p_mnist.config` (`PROJECT_ROOT`, `DATA_DIR`, `MODELS_DIR`, …) rather than relative paths — code is independent of where you invoke it from.
 
 ## Common Commands
 
 ```bash
 # Install package + runtime dependencies (editable install)
 make install
+```
 
+```bash
 # Install dev tools + pre-commit hooks
 make dev
+```
 
+```bash
 # Run linting and formatting checks
 make lint
+```
 
+```bash
 # Auto-format code
 make format
+```
 
+```bash
 # Run tests
 make test
+```
 
+```bash
 # Clean up build artifacts
 make clean
+```
 
+```bash
 # Docker operations
 make docker_build
 make docker_run
+```
 
+```bash
 # Serve documentation locally
 make docs
 ```
-
+---
 ## Contribution Summary
 
 - **Cindy Cai** — Data exploration, EDA notebook, code review
 - **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
-- **Subodh Gundam Raju** — Model development and training (6 algorithms including CNN, 96% accuracy)
+- **Sai Subodh Gundam Raju** — Model development and training (six algorithms including CNN, ~99.5% accuracy); Hydra config for training and prediction CLIs (Phase 2)
 - **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
-
+---
 ## References
 
 - [Project Documentation](docs/index.md)
 - [Phase 1 — Project Design & Model Development](PHASE1.md)
 - [Phase 2 — Containerization & Monitoring](PHASE2.md)
 - [Phase 3 — CI/CD & Deployment](PHASE3.md)
-
+---
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
