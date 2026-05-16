@@ -90,18 +90,16 @@ set_seed(42)
 
 ## Training / Prediction CLIs
 
+Both use Hydra with `configs/config.yaml`. You can override keys from the terminal:
+
 ```bash
-python -m s4p_mnist.train_model --epochs 100 --batch-size 64
-python -m s4p_mnist.predict_model --model-path models/model.joblib --input data/processed/test.csv
+python -m s4p_mnist.train_model training.epochs=12 training.batch_size=64
+python -m s4p_mnist.predict_model predict.output_file=out/preds.csv
 ```
 
 ## Hydra Configuration
 
-Configuration is managed through Hydra — see `configs/config.yaml` for defaults and override at runtime:
-
-```bash
-python -m s4p_mnist.train_model model.name=custom_model training.epochs=200
-```
+Training reads `paths`, `data`, and `training`. Prediction reads `predict`. Relative paths are resolved from `s4p_mnist.config.PROJECT_ROOT` so you do not have to cd into a specific folder first.
 
 ---
 

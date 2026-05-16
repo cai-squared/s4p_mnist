@@ -195,25 +195,17 @@ s4p_mnist/                  # Repository root
 
 ## Configuration
 
-### Using Hydra Configuration
-Configuration is managed via Hydra. Edit `configs/config.yaml`:
+### Using Hydra
+Train and predict both go through `configs/config.yaml`. Training uses `paths`, `data`, and `training`. Prediction uses the `predict` block. The yaml sets `hydra.job.chdir` to `false` so the repo root stays stable for data loading.
 
-```yaml
-model:
-  name: my_model
-  type: sklearn
-training:
-  epochs: 100
-  batch_size: 32
-```
-
-Override at runtime:
+Edit the yaml when the whole team should pick up a change, or use overrides for a single run:
 
 ```bash
-python -m s4p_mnist.train_model \
-  model.name=custom_model \
-  training.epochs=200
+python -m s4p_mnist.train_model training.learning_rate=0.0008 data.val_fraction=0.15
+python -m s4p_mnist.predict_model predict.output_file=out/preds.csv
 ```
+
+`training.epochs=0` and similar mistakes fail in the CLI before training starts.
 
 ## Troubleshooting
 
