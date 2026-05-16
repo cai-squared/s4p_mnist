@@ -12,7 +12,7 @@ Store FastAPI application code and REST API endpoints here.
 
 ```bash
 # Run development server
-uvicorn S4P_MNIST.api.main:app --reload
+uvicorn s4p_mnist.api.main:app --reload
 ```
 
 ## Phase

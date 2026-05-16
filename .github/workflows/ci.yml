@@ -44,11 +44,11 @@ jobs:
 
       - name: Type check with mypy
         run: |
-          mypy src/S4P_MNIST
+          mypy src/s4p_mnist
 
       - name: Run tests with pytest
         run: |
-          pytest tests/ --cov=S4P_MNIST --cov-report=xml
+          pytest tests/ --cov=s4p_mnist --cov-report=xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

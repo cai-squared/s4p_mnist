@@ -13,13 +13,13 @@ dev: install
 	pre-commit install
 
 data:
-	python -m S4P_MNIST.data.make_dataset
+	python -m s4p_mnist.data.make_dataset
 
 train:
-	python -m S4P_MNIST.train_model
+	python -m s4p_mnist.train_model
 
 predict:
-	python -m S4P_MNIST.predict_model
+	python -m s4p_mnist.predict_model
 
 test:
 	pytest tests/
@@ -42,10 +42,13 @@ clean:
 	find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null || true
 
 docker_build:
-	docker build -t S4P_MNIST -f dockerfiles/Dockerfile .
+	docker build -t s4p_mnist -f dockerfiles/Dockerfile .
 
 docker_run:
-	docker run --rm S4P_MNIST
+	docker run -it --rm \
+		-v "$(PWD)/data:/app/data" \
+		-v "$(PWD)/models:/app/models" \
+		s4p_mnist:latest
 
 docs:
 	mkdocs serve

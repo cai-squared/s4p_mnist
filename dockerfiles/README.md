@@ -12,7 +12,7 @@ Store Docker configurations and container setup files here.
 
 ```bash
 # Build image
-docker build -f dockerfiles/Dockerfile -t S4P_MNIST:latest .
+docker build -f dockerfiles/Dockerfile -t s4p_mnist:latest .
 
 # Run container
 docker compose up

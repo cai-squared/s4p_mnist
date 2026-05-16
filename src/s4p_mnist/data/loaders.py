@@ -16,7 +16,7 @@ The processed arrays produced by this module are kept as ``uint8`` with
 pixel values in ``[0, 255]`` and image shape ``(N, 28, 28)``. Normalization
 and reshaping/flattening are intentionally *not* performed here: those are
 modeling/feature-engineering concerns and live in
-``S4P_MNIST.features.build_features``. Keeping the data layer
+``s4p_mnist.features.build_features``. Keeping the data layer
 transformation-free means ``data/processed/`` remains a single,
 unambiguous source of truth.
 """
@@ -25,13 +25,13 @@ from __future__ import annotations
 
 import struct
 from pathlib import Path
-from typing import Final
+from typing import Final, TypeAlias
 
 import numpy as np
 import numpy.typing as npt
 
-from S4P_MNIST.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
-from S4P_MNIST.logging_config import get_logger
+from s4p_mnist.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
+from s4p_mnist.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -56,8 +56,8 @@ PROCESSED_Y_TEST: Final[str] = "y_test.npy"
 
 # Type aliases. ``npt.NDArray[np.uint8]`` keeps mypy honest about the dtype
 # we emit: anyone downstream who needs floats must cast explicitly.
-ImageArray = npt.NDArray[np.uint8]
-LabelArray = npt.NDArray[np.uint8]
+ImageArray: TypeAlias = npt.NDArray[np.uint8]
+LabelArray: TypeAlias = npt.NDArray[np.uint8]
 
 
 def _read_idx_images(path: Path) -> ImageArray:
@@ -173,7 +173,7 @@ def load_raw(
     ----------
     raw_dir : Path, optional
         Directory containing the four IDX files. Defaults to
-        :data:`S4P_MNIST.config.RAW_DATA_DIR`.
+        :data:`s4p_mnist.config.RAW_DATA_DIR`.
 
     Returns
     -------
@@ -238,7 +238,7 @@ def save_processed(
         Arrays to persist.
     processed_dir : Path, optional
         Output directory. Defaults to
-        :data:`S4P_MNIST.config.PROCESSED_DATA_DIR`.
+        :data:`s4p_mnist.config.PROCESSED_DATA_DIR`.
     """
     processed_dir = (
         Path(processed_dir) if processed_dir is not None else PROCESSED_DATA_DIR
@@ -273,7 +273,7 @@ def load_processed(
     ----------
     processed_dir : Path, optional
         Directory containing the four ``.npy`` files. Defaults to
-        :data:`S4P_MNIST.config.PROCESSED_DATA_DIR`.
+        :data:`s4p_mnist.config.PROCESSED_DATA_DIR`.
 
     Returns
     -------
