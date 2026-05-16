@@ -4,7 +4,7 @@ machine learning for MNIST
 
 ## Overview
 
-Welcome to S4P_MNIST! This project is designed to provide a scalable, production-ready machine learning pipeline.
+Welcome to s4p_mnist! This project is designed to provide a scalable, production-ready machine learning pipeline.
 
 ## Quick Start
 
@@ -39,9 +39,9 @@ make predict
 ## Project Structure
 
 ```
-S4P_MNIST/                  # Repository root
+s4p_mnist/                  # Repository root
 ├── src/
-│   └── S4P_MNIST/          # Importable package (src/ layout)
+│   └── s4p_mnist/          # Importable package (src/ layout)
 │       ├── config.py                  # Paths + typed config
 │       ├── logging_config.py
 │       ├── data/                      # Loaders + raw→processed pipeline
