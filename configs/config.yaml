@@ -1,44 +1,26 @@
-
-# Hydra configuration for s4p_mnist
-
 defaults:
   - _self_
 
-model:
-  name: default_model
-  type: sklearn
-  parameters:
-    max_depth: 10
-    min_samples_split: 2
-
-data:
-  raw_path: data/raw
-  processed_path: data/processed
-  train_test_split: 0.8
-  random_state: 42
-  val_split: 0.1
-
-training:
-  epochs: 100
-  batch_size: 32
-  learning_rate: 0.001
-  optimizer: adam
-  loss_function: mse
-  early_stopping: true
-  early_stopping_patience: 10
-
-evaluation:
-  metrics:
-    - mse
-    - rmse
-    - mae
-  cv_folds: 5
-
-logging:
-  level: INFO
-  output_dir: logs
+hydra:
+  job:
+    chdir: false
 
 paths:
+  data_processed: data/processed
   models_dir: models
-  logs_dir: logs
-  predictions_dir: predictions
+
+data:
+  val_fraction: 0.1
+
+training:
+  epochs: 18
+  batch_size: 128
+  learning_rate: 0.0012
+  weight_decay: 0.0001
+  dropout: 0.3
+  seed: 42
+
+predict:
+  model_file: models/model.joblib
+  input_dir: data/processed
+  output_file: predictions.csv
