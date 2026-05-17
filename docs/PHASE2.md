@@ -60,9 +60,17 @@ cProfile, PyTorch Profiler - Cindy
 
 ### 4.1 Experiment Tracking Tool
 
-WandB is integrated into the model training. It is initialized with `entity="rriffaha-"` and `project="s4p-mnist"`. Each member of the team can run experiments on their own computers by running `wandb login` on their command line. If someone is running via docker, they can use Cindy's API key, which is listed in the docker section of this document.
+Weights & Biases is integrated into the model training. It is initialized with `wandb.init()` setting `entity="rriffaha-"` and `project="s4p-mnist"`. It logs all hyperparameters (epochs, batch_size, lr, dropout, weight_decay, val_fraction, seed) automatically via the configuration dictionary.
 
-For each experiment, WandB saves the configuration, the accuracy of the model, and the model as an artifact. Comparing runs is easy with the WandB dashboard.
+Each member of the team can run experiments on their own computers by running `wandb login` on their command line. If someone is running via docker, they can use Cindy's API key, which is listed in the docker section of this document.
+
+For each experiment, WandB saves the configuration, the accuracy of the model, and the model as an artifact. Comparing runs is easy with the WandB dashboard. The final test accuracy is logged as both a metric and pinned to the run summary. The trained model is saved as a versioned W&B Artifact with hyperparameters in the metadata.
+
+WandB is automatically enabled (in the Hydra configuration file, `training.wandb=true`). To disable WandB, one can run:
+
+```
+python -m s4p_mnist.train_model training.wandb=false
+```
 
 TODO: report link!
 
