@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import argparse
-import os
 from pathlib import Path
 from typing import Any, Literal
 
@@ -101,16 +99,6 @@ def train(
     dropout: float,
     use_wandb: bool = True,
 ) -> None:
-    model_dir.mkdir(parents=True, exist_ok=True)
-    x_train, y_train = load_training_xy(data_path, download=True)
-    logger.info(
-        "Training CNN on %d samples (epochs=%d batch_size=%d lr=%g)",
-        len(x_train),
-        epochs,
-        batch_size,
-        lr,
-    )
-
     cfg: dict[str, Any] = {
         "epochs": epochs,
         "batch_size": batch_size,
@@ -123,12 +111,23 @@ def train(
 
     wandb_mode: Literal["online", "disabled"] = "online" if use_wandb else "disabled"
     run = wandb.init(
-        project=os.environ.get("WANDB_PROJECT", "s4p-mnist"),
+        entity="rriffaha-",
+        project="s4p-mnist",
         config=cfg,
         job_type="train",
         mode=wandb_mode,
     )
     logger.info("W&B run initialized: mode=%s name=%s", wandb_mode, run.name)
+
+    model_dir.mkdir(parents=True, exist_ok=True)
+    x_train, y_train = load_training_xy(data_path, download=True)
+    logger.info(
+        "Training CNN on %d samples (epochs=%d batch_size=%d lr=%g)",
+        len(x_train),
+        epochs,
+        batch_size,
+        lr,
+    )
 
     model = Model(cfg)
     model.fit(x_train, y_train)
@@ -188,12 +187,13 @@ def main(cfg: DictConfig) -> None:
     _check_train_cfg(cfg)
     setup_logging()
 
-    data_path = _resolve_under_root(str(cfg.paths.data_processed))
-    model_dir = _resolve_under_root(str(cfg.paths.models_dir))
     t = cfg.training
     d = cfg.data
 
     set_seed(int(t.seed))
+
+    data_path = _resolve_under_root(str(cfg.paths.data_processed))
+    model_dir = _resolve_under_root(str(cfg.paths.models_dir))
 
     train(
         data_path,
