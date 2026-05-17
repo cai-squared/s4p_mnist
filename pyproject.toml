@@ -57,6 +57,11 @@ disallow_untyped_defs = true
 # Third-party libs without stubs (pandas, sklearn, joblib, torchvision, tensorflow).
 disable_error_code = ["import-untyped"]
 
+[[tool.mypy.overrides]]
+module = ["wandb", "wandb.*"]
+follow_imports = "skip"
+ignore_errors = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"

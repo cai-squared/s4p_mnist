@@ -153,3 +153,6 @@ config/local_settings.py
 
 # Weights & Biases local run cache
 wandb/
+
+# Hydra outputs
+outputs/

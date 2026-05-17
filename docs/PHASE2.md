@@ -31,6 +31,7 @@ If you are just running from the s4p_mnist directory, you can directly use the c
 
 ```
 docker run -it --rm \
+    -e WANDB_API_KEY=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 \
     -v "$(PWD)/data:/app/data" \
     -v "$(PWD)/models:/app/models" \
     s4p_mnist:latest
@@ -42,9 +43,10 @@ The docker image contains all of the requirements listed in `requirements.txt`.
 
 ## 2. Monitoring & Debugging
 
-W&B, PDB, IPDB - Riffa
-
 ### 2.1 Monitoring
+
+Monitoring is done with WandB. System metrics are automatically generated.
+
 ### 2.2 Debugging Practices
 
 ## 3. Profiling & Optimization
@@ -56,9 +58,13 @@ cProfile, PyTorch Profiler - Cindy
 
 ## 4. Experiment Management & Tracking
 
-W&B - Riffa
-
 ### 4.1 Experiment Tracking Tool
+
+WandB is integrated into the model training. It is initialized with `entity="rriffaha-"` and `project="s4p-mnist"`. Each member of the team can run experiments on their own computers by running `wandb login` on their command line. If someone is running via docker, they can use Cindy's API key, which is listed in the docker section of this document.
+
+For each experiment, WandB saves the configuration, the accuracy of the model, and the model as an artifact. Comparing runs is easy with the WandB dashboard.
+
+TODO: report link!
 
 ## 5. Application & Experiment Logging
 
@@ -69,27 +75,17 @@ logging - Saumyaa
 
 ## 6. Configuration Management
 
-**Owner:** Subodh (Hydra / Part F)
+Hydra is now on both entry points, `train_model.py` and `predict_model.py`, with `@hydra.main` pointing at the same `configs/config.yaml` file the starter repo came with. Training parameters (epochs, batch size, lr, weight decay, dropout, seed, val split) plus the `paths` entries for processed MNIST and the `models/` folder all sit in the yaml. Prediction is configured under a `predict:` block in that same file so `predict_model` does not need its own configuration file.
 
-Phase 1 was mostly about getting the CNN to actually learn; I already had the model side working and the scores we reported in the table above. For Phase 2 the professor wanted Hydra, so this section is me wiring that requirement onto the code we already had instead of rewriting the network from scratch.
+Before either script does real work it sanity-checks the configuration (epochs at least 1, dropout between 0 and 1, val split between 0 and 1, paths not blank). `hydra.job.chdir` is false and paths still get resolved from `PROJECT_ROOT`, so Hydra's output folders get created in the project directory.
 
-Hydra is on both entry points now, `train_model.py` and `predict_model.py`, with `@hydra.main` pointing at the same `configs/config.yaml` file the starter repo came with. Training knobs (epochs, batch size, lr, weight decay, dropout, seed, val split) plus the `paths` entries for processed MNIST and the `models/` folder all sit in the yaml. I tucked prediction under a `predict:` block in that same file so `predict_model` does not need its own mystery config.
+The default configuration is in `configs/config.yaml` and the default hyperparameters are the same as from part 1, just wired with Hydra. To experiment, one can override the hyperparameters from the command line. For example:
 
-I stayed with one yaml on purpose. The rubric asked for a second setup you can compare; for me that is just a shell override when I want a shorter run (`training.epochs=3` style) instead of duplicating almost the same file in git.
-
-Before either script does real work it sanity-checks the merged config (epochs at least 1, dropout between 0 and 1, val split between 0 and 1, paths not blank). The checks live next to the CLIs so there is not another module to drift out of sync.
-
-Commands that work on my machine:
-
-```bash
-make train
+```
 python -m s4p_mnist.train_model training.epochs=3 training.batch_size=256
-python -m s4p_mnist.predict_model predict.output_file=reports/val_preds.csv
 ```
 
-`hydra.job.chdir` is false and paths still get resolved from `PROJECT_ROOT`, so I am not fighting Hydra’s output folders when MNIST tries to load.
-
-For the write-up: the numbers in `configs/config.yaml` are the same ones that gave us the high nineties accuracy in Phase 1. If I intentionally train for three epochs to save time, the accuracy drop is on me, not a bug.
+trains the model with the number of epochs changed to 3 and the batch size changed to 256. One can track the results of the different experiments with WandB. The default configuration gives us an accuracy of 99.5% while the customized configuration gives us an accuracy of 99.2%.
 
 ## 7. Documentation & Repository Updates
 
