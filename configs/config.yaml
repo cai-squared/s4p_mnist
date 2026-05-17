@@ -19,6 +19,7 @@ training:
   weight_decay: 0.0001
   dropout: 0.3
   seed: 42
+  wandb: true
 
 predict:
   model_file: models/model.joblib
