@@ -49,6 +49,74 @@ Monitoring is done with WandB. System metrics are automatically generated.
 
 ### 2.2 Debugging Practices
 
+Interactive debugging is done with `pdb` (built-in) and `ipdb` (enhanced, with tab completion and syntax highlighting). Install `ipdb` with:
+
+    pip install ipdb
+
+To drop into an interactive debugger at any point in the code, insert:
+
+    import ipdb; ipdb.set_trace()
+
+This pauses execution and opens an interactive shell. Useful commands:
+
+| Command | Action |
+|---------|--------|
+| `n` | Next line |
+| `s` | Step into function |
+| `c` | Continue to next breakpoint |
+| `p <var>` | Print variable |
+| `q` | Quit debugger |
+
+---
+
+#### Debug Scenario 1: NaN Values in Training Data
+
+**Problem:** Training loss is `nan` from the first epoch. The model never learns.
+
+**Cause:** `X_train` contains NaN or Inf values — e.g. a corrupted `.npy` file or a bad normalization step.
+
+**Detection:** `_assert_no_nan()` in `train_model.py` raises immediately:
+
+    AssertionError: X_train contains NaN values — check your data pipeline.
+
+**How to investigate with ipdb:** Add a breakpoint in `load_training_xy` before the assertion:
+
+    import ipdb; ipdb.set_trace()
+    _assert_no_nan(x_arr, "X_train")
+
+Then inspect:
+
+    pp np.isnan(x_arr).sum()       # how many NaN values
+    pp np.where(np.isnan(x_arr))   # which samples are affected
+    pp x_arr.min(), x_arr.max()    # check value range
+
+**Fix:** Re-run `make data` to regenerate clean processed files.
+
+---
+
+#### Debug Scenario 2: Shape Mismatch
+
+**Problem:** Training crashes immediately with a dimension error inside the model.
+
+**Cause:** `X_train` has shape `(N, 28, 28)` — images were not flattened before being passed to the model.
+
+**Detection:** `_assert_shape()` in `train_model.py` raises immediately:
+
+    AssertionError: Expected x shape (N, 784), got (60000, 28, 28). Images must be flattened 28x28 pixels.
+
+**How to investigate with ipdb:** Add a breakpoint before the assertion:
+
+    import ipdb; ipdb.set_trace()
+    _assert_shape(x_arr, y_arr)
+
+Then inspect:
+
+    pp x_arr.shape    # should be (60000, 784)
+    pp y_arr.shape    # should be (60000,)
+    pp x_arr.dtype    # should be float32
+
+**Fix:** Ensure `.reshape(X_train_img.shape[0], -1)` is called in `load_training_xy` before the assertions.
+
 ## 3. Profiling & Optimization
 
 cProfile, PyTorch Profiler - Cindy
@@ -72,7 +140,19 @@ WandB is automatically enabled (in the Hydra configuration file, `training.wandb
 python -m s4p_mnist.train_model training.wandb=false
 ```
 
-TODO: report link!
+W&B Report: [Report](https://wandb.ai/rriffaha-/s4p-mnist/reports/Phase-2-Experiment-Comparison-S4P-MNIST--VmlldzoxNjkxMjA0NQ)
+
+### 4.2 Experiment Results
+
+Three experiments were run to evaluate the effect of learning rate and dropout:
+
+| Run | Learning Rate | Dropout | Test Accuracy |
+|-----|--------------|---------|---------------|
+| rural-pine-12 | 0.0012 | 0.3 | 99.45% |
+| vital-serenity-13 | 0.005 | 0.3 | 99.50% |
+| flowing-thunder-14 | 0.0012 | 0.5 | **99.53%** |
+
+Best model: `flowing-thunder-14`. Higher dropout (0.5) provided the best regularization without sacrificing accuracy. The best model is saved as W&B Artifact `s4p-mnist-model:v0`.
 
 ## 5. Application & Experiment Logging
 
