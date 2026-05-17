@@ -205,6 +205,7 @@ def main(cfg: DictConfig) -> None:
         val_fraction=float(d.val_fraction),
         weight_decay=float(t.weight_decay),
         dropout=float(t.dropout),
+        use_wandb=t.wandb,
     )
     logger.info("Training complete")
 
