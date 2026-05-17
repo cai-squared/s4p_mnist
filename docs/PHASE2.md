@@ -49,6 +49,74 @@ Monitoring is done with WandB. System metrics are automatically generated.
 
 ### 2.2 Debugging Practices
 
+Interactive debugging is done with `pdb` (built-in) and `ipdb` (enhanced, with tab completion and syntax highlighting). Install `ipdb` with:
+
+    pip install ipdb
+
+To drop into an interactive debugger at any point in the code, insert:
+
+    import ipdb; ipdb.set_trace()
+
+This pauses execution and opens an interactive shell. Useful commands:
+
+| Command | Action |
+|---------|--------|
+| `n` | Next line |
+| `s` | Step into function |
+| `c` | Continue to next breakpoint |
+| `p <var>` | Print variable |
+| `q` | Quit debugger |
+
+---
+
+#### Debug Scenario 1: NaN Values in Training Data
+
+**Problem:** Training loss is `nan` from the first epoch. The model never learns.
+
+**Cause:** `X_train` contains NaN or Inf values — e.g. a corrupted `.npy` file or a bad normalization step.
+
+**Detection:** `_assert_no_nan()` in `train_model.py` raises immediately:
+
+    AssertionError: X_train contains NaN values — check your data pipeline.
+
+**How to investigate with ipdb:** Add a breakpoint in `load_training_xy` before the assertion:
+
+    import ipdb; ipdb.set_trace()
+    _assert_no_nan(x_arr, "X_train")
+
+Then inspect:
+
+    pp np.isnan(x_arr).sum()       # how many NaN values
+    pp np.where(np.isnan(x_arr))   # which samples are affected
+    pp x_arr.min(), x_arr.max()    # check value range
+
+**Fix:** Re-run `make data` to regenerate clean processed files.
+
+---
+
+#### Debug Scenario 2: Shape Mismatch
+
+**Problem:** Training crashes immediately with a dimension error inside the model.
+
+**Cause:** `X_train` has shape `(N, 28, 28)` — images were not flattened before being passed to the model.
+
+**Detection:** `_assert_shape()` in `train_model.py` raises immediately:
+
+    AssertionError: Expected x shape (N, 784), got (60000, 28, 28). Images must be flattened 28x28 pixels.
+
+**How to investigate with ipdb:** Add a breakpoint before the assertion:
+
+    import ipdb; ipdb.set_trace()
+    _assert_shape(x_arr, y_arr)
+
+Then inspect:
+
+    pp x_arr.shape    # should be (60000, 784)
+    pp y_arr.shape    # should be (60000,)
+    pp x_arr.dtype    # should be float32
+
+**Fix:** Ensure `.reshape(X_train_img.shape[0], -1)` is called in `load_training_xy` before the assertions.
+
 ## 3. Profiling & Optimization
 
 cProfile, PyTorch Profiler - Cindy

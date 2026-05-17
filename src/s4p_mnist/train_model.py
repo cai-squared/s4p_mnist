@@ -18,6 +18,35 @@ from s4p_mnist.utils.seed import set_seed
 logger = get_logger(__name__)
 
 
+def _assert_no_nan(x: np.ndarray, name: str = "X") -> None:
+    """Raise AssertionError if x contains NaN or Inf values."""
+    if np.isnan(x).any():
+        raise AssertionError(
+            f"{name} contains NaN values — check your data pipeline."
+        )
+    if np.isinf(x).any():
+        raise AssertionError(
+            f"{name} contains Inf values — check normalization step."
+        )
+
+
+def _assert_shape(x: np.ndarray, y: np.ndarray) -> None:
+    """Raise AssertionError if x/y shapes are incompatible with MNIST."""
+    if x.ndim != 2 or x.shape[1] != 784:
+        raise AssertionError(
+            f"Expected x shape (N, 784), got {x.shape}. "
+            "Images must be flattened 28x28 pixels."
+        )
+    if y.ndim != 1:
+        raise AssertionError(
+            f"Expected y shape (N,), got {y.shape}."
+        )
+    if x.shape[0] != y.shape[0]:
+        raise AssertionError(
+            f"Sample count mismatch: x has {x.shape[0]} rows but y has {y.shape[0]}."
+        )
+
+
 def _check_train_cfg(cfg: DictConfig) -> None:
     if not OmegaConf.is_config(cfg):
         raise TypeError("cfg must be an OmegaConf config")
@@ -67,6 +96,8 @@ def load_training_xy(
         )
         y_arr = y_train.astype(np.int64, copy=False)
         logger.info("Loaded training from processed .npy in %s", data_path)
+        _assert_no_nan(x_arr, "X_train")
+        _assert_shape(x_arr, y_arr)
         return x_arr, y_arr
     except FileNotFoundError:
         logger.info("Processed .npy not found under %s", data_path)
@@ -83,6 +114,8 @@ def load_training_xy(
     )
     x_arr = raw.data.numpy().astype(np.float32).reshape(-1, 784) / 255.0
     y_arr = raw.targets.numpy().astype(np.int64, copy=False)
+    _assert_no_nan(x_arr, "X_train")
+    _assert_shape(x_arr, y_arr)
     return x_arr, y_arr
 
 
