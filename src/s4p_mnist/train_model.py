@@ -21,13 +21,9 @@ logger = get_logger(__name__)
 def _assert_no_nan(x: np.ndarray, name: str = "X") -> None:
     """Raise AssertionError if x contains NaN or Inf values."""
     if np.isnan(x).any():
-        raise AssertionError(
-            f"{name} contains NaN values — check your data pipeline."
-        )
+        raise AssertionError(f"{name} contains NaN values — check your data pipeline.")
     if np.isinf(x).any():
-        raise AssertionError(
-            f"{name} contains Inf values — check normalization step."
-        )
+        raise AssertionError(f"{name} contains Inf values — check normalization step.")
 
 
 def _assert_shape(x: np.ndarray, y: np.ndarray) -> None:
@@ -38,9 +34,7 @@ def _assert_shape(x: np.ndarray, y: np.ndarray) -> None:
             "Images must be flattened 28x28 pixels."
         )
     if y.ndim != 1:
-        raise AssertionError(
-            f"Expected y shape (N,), got {y.shape}."
-        )
+        raise AssertionError(f"Expected y shape (N,), got {y.shape}.")
     if x.shape[0] != y.shape[0]:
         raise AssertionError(
             f"Sample count mismatch: x has {x.shape[0]} rows but y has {y.shape[0]}."
