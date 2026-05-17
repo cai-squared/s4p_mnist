@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 from typing import Literal
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -21,11 +20,7 @@ def setup_logging(level: LogLevel = "INFO", fmt: str = _DEFAULT_FORMAT) -> None:
     root.setLevel(level)
 
     for handler in list(root.handlers):
-        root.removeHandler(handler)
-
-    handler = logging.StreamHandler(stream=sys.stdout)
-    handler.setFormatter(logging.Formatter(fmt=fmt, datefmt=_DEFAULT_DATEFMT))
-    root.addHandler(handler)
+        handler.setFormatter(logging.Formatter(fmt=fmt, datefmt=_DEFAULT_DATEFMT))
 
 
 def get_logger(name: str) -> logging.Logger:
