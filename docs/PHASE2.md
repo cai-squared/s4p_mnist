@@ -64,7 +64,19 @@ WandB is integrated into the model training. It is initialized with `entity="rri
 
 For each experiment, WandB saves the configuration, the accuracy of the model, and the model as an artifact. Comparing runs is easy with the WandB dashboard.
 
-TODO: report link!
+W&B Report: [Report](https://wandb.ai/rriffaha-/s4p-mnist/reports/Phase-2-Experiment-Comparison-S4P-MNIST--VmlldzoxNjkxMjA0NQ)
+
+### 4.2 Experiment Results
+
+Three experiments were run to evaluate the effect of learning rate and dropout:
+
+| Run | Learning Rate | Dropout | Test Accuracy |
+|-----|--------------|---------|---------------|
+| rural-pine-12 | 0.0012 | 0.3 | 99.45% |
+| vital-serenity-13 | 0.005 | 0.3 | 99.50% |
+| flowing-thunder-14 | 0.0012 | 0.5 | **99.53%** |
+
+Best model: `flowing-thunder-14`. Higher dropout (0.5) provided the best regularization without sacrificing accuracy. The best model is saved as W&B Artifact `s4p-mnist-model:v0`.
 
 ## 5. Application & Experiment Logging
 
