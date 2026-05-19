@@ -119,10 +119,33 @@ Then inspect:
 
 ## 3. Profiling & Optimization
 
-cProfile, PyTorch Profiler - Cindy
-
 ### 3.1 Python-level Profiling
+
+cProfile is used to profile the training script. To profile, run `make profile`. This profiles with cProfile and then visualizes the output (checked in as `stats.prof`) with snakeviz.
+
 ### 3.2 Framework Profiling
+
+PyTorch profiling is integrated into the training script. The first epoch is analyzed. Both cProfile and PyTorch profiling found that the bottleneck was in the backward pass with the model. To optimize this, the option "MPS" was given to the PyTorch device selector. Before, the device selector block looked like this:
+
+```
+class Model(BaseModel):
+    def _device(self) -> torch.device:
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+```
+
+After, it looks like this:
+
+```
+class Model(BaseModel):
+    def _device(self) -> torch.device:
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            return torch.device("mps")
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        return torch.device("cpu")
+```
+
+This allows users on Mac computers to take advantage of GPU. On Cindy's computer, training time went from 20 minutes to 3 minutes.
 
 ## 4. Experiment Management & Tracking
 
@@ -140,7 +163,7 @@ WandB is automatically enabled (in the Hydra configuration file, `training.wandb
 python -m s4p_mnist.train_model training.wandb=false
 ```
 
-W&B Report: [Report](https://wandb.ai/rriffaha-/s4p-mnist/reports/Phase-2-Experiment-Comparison-S4P-MNIST--VmlldzoxNjkxMjA0NQ)
+W&B Report: [Report](https://api.wandb.ai/links/rriffaha-/epd7z4xp)
 
 ### 4.2 Experiment Results
 
@@ -150,9 +173,9 @@ Three experiments were run to evaluate the effect of learning rate and dropout:
 |-----|--------------|---------|---------------|
 | rural-pine-12 | 0.0012 | 0.3 | 99.45% |
 | vital-serenity-13 | 0.005 | 0.3 | 99.50% |
-| flowing-thunder-14 | 0.0012 | 0.5 | **99.53%** |
+| flowing-thunder-14 | 0.0012 | 0.5 | 99.53% |
 
-Best model: `flowing-thunder-14`. Higher dropout (0.5) provided the best regularization without sacrificing accuracy. The best model is saved as W&B Artifact `s4p-mnist-model:v0`.
+Best model: `flowing-thunder-14`. The best model is saved as W&B Artifact `s4p-mnist-model:v0`. However, the improvement is negligible and may be due to random chance.
 
 ## 5. Application & Experiment Logging
 
