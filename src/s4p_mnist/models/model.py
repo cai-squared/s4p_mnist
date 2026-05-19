@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.profiler import ProfilerActivity, profile, record_function
 from torch.utils.data import DataLoader, TensorDataset
 
 from s4p_mnist.models.base import BaseModel
@@ -57,7 +58,11 @@ class Model(BaseModel):
         self._fitted = False
 
     def _device(self) -> torch.device:
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            return torch.device("mps")
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        return torch.device("cpu")
 
     @staticmethod
     def _prepare_x(X: np.ndarray) -> torch.Tensor:
@@ -79,6 +84,24 @@ class Model(BaseModel):
             torch.Tensor,
             torch.from_numpy(np.ascontiguousarray(x)),
         )
+
+    def _train_epoch(
+        self,
+        train_loader: DataLoader,
+        optimizer: torch.optim.Optimizer,
+        criterion: nn.Module,
+        device: torch.device,
+    ) -> None:
+        self._net.train()
+        non_blocking = device.type == "cuda"
+        for xb, yb in train_loader:
+            xb = xb.to(device, non_blocking=non_blocking)
+            yb = yb.to(device, non_blocking=non_blocking)
+            optimizer.zero_grad(set_to_none=True)
+            logits = self._net(xb)
+            loss = criterion(logits, yb)
+            loss.backward()
+            optimizer.step()
 
     def fit(self, X: Any, y: Any) -> Model:
         if not isinstance(X, np.ndarray):
@@ -135,25 +158,50 @@ class Model(BaseModel):
 
         best_val = -1.0
         best_state: dict[str, torch.Tensor] | None = None
-        for _ in range(epochs):
-            self._net.train()
-            for xb, yb in train_loader:
-                xb = xb.to(device, non_blocking=True)
-                yb = yb.to(device, non_blocking=True)
-                optimizer.zero_grad(set_to_none=True)
-                logits = self._net(xb)
-                loss = criterion(logits, yb)
-                loss.backward()
-                optimizer.step()
+
+        out_dir = Path(self.config.get("out_dir", ""))
+
+        for epoch in range(epochs):
+            if epoch == 0:
+                with profile(
+                    activities=[ProfilerActivity.CPU],
+                    record_shapes=False,
+                    profile_memory=False,
+                    with_stack=False,
+                ) as prof:
+                    with record_function("train_epoch"):
+                        self._train_epoch(
+                            train_loader,
+                            optimizer,
+                            criterion,
+                            device,
+                        )
+
+                with open(out_dir / "profile.txt", "w") as f:
+                    f.write(
+                        prof.key_averages().table(
+                            sort_by="self_cpu_time_total", row_limit=30
+                        )
+                    )
+
+            else:
+                self._train_epoch(
+                    train_loader,
+                    optimizer,
+                    criterion,
+                    device,
+                )
+
             scheduler.step()
 
             self._net.eval()
+            non_blocking = device.type == "cuda"
             correct = 0
             total = 0
             with torch.no_grad():
                 for xb, yb in val_loader:
-                    xb = xb.to(device, non_blocking=True)
-                    yb = yb.to(device, non_blocking=True)
+                    xb = xb.to(device, non_blocking=non_blocking)
+                    yb = yb.to(device, non_blocking=non_blocking)
                     pred = self._net(xb).argmax(dim=1)
                     correct += int((pred == yb).sum().item())
                     total += yb.size(0)
@@ -181,9 +229,12 @@ class Model(BaseModel):
         xt = self._prepare_x(X)
         preds: list[int] = []
         batch_size = int(self.config.get("batch_size", 512))
+        non_blocking = device.type == "cuda"
         with torch.no_grad():
             for start in range(0, xt.size(0), batch_size):
-                chunk = xt[start : start + batch_size].to(device, non_blocking=True)
+                chunk = xt[start : start + batch_size].to(
+                    device, non_blocking=non_blocking
+                )
                 logits = self._net(chunk)
                 preds.extend(logits.argmax(dim=1).cpu().numpy().tolist())
         return np.asarray(preds, dtype=np.int64)

@@ -6,6 +6,7 @@ from typing import Any, Literal
 import hydra
 import numpy as np
 import wandb
+from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets
 
@@ -124,6 +125,7 @@ def train(
     val_fraction: float,
     weight_decay: float,
     dropout: float,
+    out_dir: Path,
     use_wandb: bool = True,
 ) -> None:
     cfg: dict[str, Any] = {
@@ -146,6 +148,8 @@ def train(
     )
     logger.info("W&B run initialized: mode=%s name=%s", wandb_mode, run.name)
 
+    cfg["out_dir"] = str(out_dir)
+
     model_dir.mkdir(parents=True, exist_ok=True)
     x_train, y_train = load_training_xy(data_path, download=True)
     logger.info(
@@ -158,6 +162,7 @@ def train(
 
     model = Model(cfg)
     model.fit(x_train, y_train)
+    logger.info("Finished training model for %d epochs", epochs)
 
     out_path = model_dir / "model.joblib"
     model.save(out_path)
@@ -222,6 +227,8 @@ def main(cfg: DictConfig) -> None:
     data_path = _resolve_under_root(str(cfg.paths.data_processed))
     model_dir = _resolve_under_root(str(cfg.paths.models_dir))
 
+    out_dir = Path(HydraConfig.get().runtime.output_dir)
+
     train(
         data_path,
         model_dir,
@@ -232,6 +239,7 @@ def main(cfg: DictConfig) -> None:
         val_fraction=float(d.val_fraction),
         weight_decay=float(t.weight_decay),
         dropout=float(t.dropout),
+        out_dir=out_dir,
         use_wandb=t.wandb,
     )
     logger.info("Training complete")

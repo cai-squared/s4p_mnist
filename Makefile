@@ -53,3 +53,7 @@ docker_run:
 
 docs:
 	mkdocs serve
+
+profile:
+	python -m cProfile -o stats.prof src/s4p_mnist/train_model.py
+	snakeviz stats.prof
