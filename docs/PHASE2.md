@@ -125,7 +125,7 @@ cProfile is used to profile the training script. To profile, run `make profile`.
 
 ### 3.2 Framework Profiling
 
-PyTorch profiling is integrated into the training script. The first epoch is analyzed. Both cProfile and PyTorch profiling found that the bottleneck was in the backward pass with the model. To optimize this, the option "MPS" was given to the PyTorch device selector. Before, the device selector block looked like this:
+PyTorch profiling is integrated into the training script. The first epoch is analyzed, and profiling metrics are written to the Hydra output folder. Both cProfile and PyTorch profiling found that the bottleneck was in the backward pass with the model. To optimize this, the option "MPS" was given to the PyTorch device selector. Before, the device selector block looked like this:
 
 ```
 class Model(BaseModel):
