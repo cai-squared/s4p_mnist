@@ -179,10 +179,42 @@ Best model: `flowing-thunder-14`. The best model is saved as W&B Artifact `s4p-m
 
 ## 5. Application & Experiment Logging
 
-logging - Saumyaa
-
 ### 5.1 Logging Setup
+
+Logs are done by a combination of Python's stdlib `logging` and `rich`. Logging is configured in `logging_config.py`. The logging level is set to INFO and there are two handlers set up: (1) a `RichHandler` for the rich-colored console output, and (2) a `RotatingFileHandler` that writes to `logs/s4p_mnist.log`.
+
+Example training output:
+
+```
+2026-05-21 13:40:29 | INFO     | s4p_mnist.train_model | W&B run initialized: mode=online name=logical-blaze-49
+2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loading processed arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST: train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 13:40:30 | INFO     | s4p_mnist.train_model | Loaded training from processed .npy in /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:40:30 | INFO     | s4p_mnist.train_model | Training CNN on 60000 samples (epochs=18 batch_size=128 lr=0.0012)
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Finished training model for 18 epochs
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Saved trained model to /Users/ccai/Downloads/SE 489/S4P_MNIST/models/model.joblib
+2026-05-21 13:43:34 | INFO     | s4p_mnist.data.loaders | Loading processed arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:43:34 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST: train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Evaluating on processed test arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Held-out MNIST test accuracy: 0.994900
+2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | W&B run finished
+2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | Training complete
+```
+
+Example prediction output:
+
+```
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Loading model from /Users/ccai/Downloads/SE 489/S4P_MNIST/models/model.joblib
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Scoring /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loading processed arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST: train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Wrote 10000 rows to /Users/ccai/Downloads/SE 489/S4P_MNIST/predictions.csv
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Prediction complete
+```
+
 ### 5.2 Rich Output
+
+Rich has been integrated so that there are colored levels and also a progress bar during training to show completed batches and epochs.
 
 ## 6. Configuration Management
 
@@ -200,7 +232,15 @@ trains the model with the number of epochs changed to 3 and the batch size chang
 
 ## 7. Documentation & Repository Updates
 
-Saumyaa
-
 ### 7.1 Updated README
+
+The base README has been updated to include this file.
+
 ### 7.2 PHASE2.md
+
+For phase 2, the contributions are as following:
+
+- Cindy: Section 1 (Containerization) / Section 3 (Profiling & Optimization)
+- Subodh: Section 6 (Configuration Management)
+- Riffa: Section 2 (Monitoring & Debugging) / Section 4 (Experiment Management & Tracking)
+- Saumyaa: Section 5 (Application & Experiment Logging)

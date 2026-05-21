@@ -293,6 +293,7 @@ class Model(BaseModel):
         if not isinstance(X, np.ndarray):
             raise TypeError("X must be a numpy.ndarray of pixels.")
         device = self._device()
+        self._net.to(device)
         self._net.eval()
         xt = self._prepare_x(X)
         preds: list[int] = []
@@ -328,5 +329,6 @@ class Model(BaseModel):
         if not isinstance(state, dict):
             raise TypeError("Invalid state_dict in model file.")
         model._net.load_state_dict(state)
+        model._net.to(model._device())
         model._fitted = True
         return model
