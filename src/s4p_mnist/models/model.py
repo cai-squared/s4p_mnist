@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import joblib
 import numpy as np
@@ -12,6 +12,26 @@ from torch.profiler import ProfilerActivity, profile, record_function
 from torch.utils.data import DataLoader, TensorDataset
 
 from s4p_mnist.models.base import BaseModel
+
+try:
+    # Import Rich progress only when available; keep optional so imports don't fail
+    from rich.progress import (
+        BarColumn,
+        Progress,
+        SpinnerColumn,
+        TextColumn,
+        TimeElapsedColumn,
+        TimeRemainingColumn,
+    )
+except Exception:  # pragma: no cover - optional dependency
+    Progress = None  # type: ignore
+
+# Provide a static typing alias so Pylance/typing tools can resolve the
+# `Progress` type without requiring `rich` at runtime.
+if TYPE_CHECKING:
+    from rich.progress import Progress as RichProgress  # type: ignore
+else:
+    RichProgress = Any  # type: ignore
 
 _BUNDLE_KIND = "s4p_mnist_torch_cnn_v1"
 
@@ -91,6 +111,8 @@ class Model(BaseModel):
         optimizer: torch.optim.Optimizer,
         criterion: nn.Module,
         device: torch.device,
+        progress: RichProgress | None = None,
+        batch_task_id: int | None = None,
     ) -> None:
         self._net.train()
         non_blocking = device.type == "cuda"
@@ -102,8 +124,13 @@ class Model(BaseModel):
             loss = criterion(logits, yb)
             loss.backward()
             optimizer.step()
+            if progress is not None and batch_task_id is not None:
+                try:
+                    progress.advance(batch_task_id)
+                except Exception:
+                    pass
 
-    def fit(self, X: Any, y: Any) -> Model:
+    def fit(self, X: Any, y: Any, *, show_progress: bool = False) -> Model:
         if not isinstance(X, np.ndarray):
             raise TypeError("X must be a numpy.ndarray of pixels.")
         if not isinstance(y, np.ndarray):
@@ -161,8 +188,31 @@ class Model(BaseModel):
 
         out_dir = Path(self.config.get("out_dir", ""))
 
+        # Optionally display a Rich progress UI for epochs and batches
+        if show_progress and Progress is not None:
+            progress = Progress(
+                SpinnerColumn(),
+                TextColumn("{task.description}"),
+                BarColumn(),
+                TextColumn("{task.completed}/{task.total}"),
+                TimeElapsedColumn(),
+                TimeRemainingColumn(),
+                transient=True,
+            )
+            progress.start()
+            epoch_task = progress.add_task("Epochs", total=epochs)
+            batch_task = progress.add_task("Batches", total=0)
+        else:
+            progress = None
+            epoch_task = None
+            batch_task = None
+
         for epoch in range(epochs):
             if epoch == 0:
+                # update batch task total before running epoch
+                if progress is not None and batch_task is not None:
+                    progress.update(batch_task, total=len(train_loader), completed=0)
+
                 with profile(
                     activities=[ProfilerActivity.CPU],
                     record_shapes=False,
@@ -175,6 +225,8 @@ class Model(BaseModel):
                             optimizer,
                             criterion,
                             device,
+                            progress=progress,
+                            batch_task_id=batch_task,
                         )
 
                 with open(out_dir / "profile.txt", "w") as f:
@@ -190,6 +242,8 @@ class Model(BaseModel):
                     optimizer,
                     criterion,
                     device,
+                    progress=progress,
+                    batch_task_id=batch_task,
                 )
 
             scheduler.step()
@@ -212,6 +266,18 @@ class Model(BaseModel):
                     k: v.detach().cpu().clone()
                     for k, v in self._net.state_dict().items()
                 }
+            # advance epoch progress
+            if progress is not None and epoch_task is not None:
+                try:
+                    progress.advance(epoch_task)
+                except Exception:
+                    pass
+
+        if show_progress and Progress is not None:
+            try:
+                progress.stop()
+            except Exception:
+                pass
 
         if best_state is not None:
             self._net.load_state_dict(best_state)

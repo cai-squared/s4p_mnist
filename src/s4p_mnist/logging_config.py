@@ -1,5 +1,4 @@
 import logging
-import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -27,6 +26,7 @@ def setup_logging(name: str = "s4p_mnist", level: int = logging.INFO) -> logging
     logger.setLevel(level)
 
     if logger.handlers:
+        logger.propagate = False
         return logger  # already configured, avoid duplicate handlers
 
     # --- Handler 1: Rich colored console output ---
@@ -55,6 +55,7 @@ def setup_logging(name: str = "s4p_mnist", level: int = logging.INFO) -> logging
 
     logger.addHandler(rich_handler)
     logger.addHandler(file_handler)
+    logger.propagate = False
     return logger
 
 
