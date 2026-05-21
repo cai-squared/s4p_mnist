@@ -25,7 +25,8 @@ dependencies = [
     "hydra-core>=1.3.0",
     "omegaconf>=2.3.0",
     "dvc>=3.55.0",
-    "snakeviz>=2.2.2"
+    "snakeviz>=2.2.2",
+    "rich>=13.0.0"
 ]
 
 [project.optional-dependencies]
