@@ -30,8 +30,10 @@ except Exception:  # pragma: no cover - optional dependency
 # `Progress` type without requiring `rich` at runtime.
 if TYPE_CHECKING:
     from rich.progress import Progress as RichProgress  # type: ignore
+    from rich.progress import TaskID as RichTaskID  # type: ignore
 else:
     RichProgress = Any  # type: ignore
+    RichTaskID = Any  # type: ignore
 
 _BUNDLE_KIND = "s4p_mnist_torch_cnn_v1"
 
@@ -112,7 +114,7 @@ class Model(BaseModel):
         criterion: nn.Module,
         device: torch.device,
         progress: RichProgress | None = None,
-        batch_task_id: int | None = None,
+        batch_task_id: RichTaskID | None = None,
     ) -> None:
         self._net.train()
         non_blocking = device.type == "cuda"
@@ -273,7 +275,7 @@ class Model(BaseModel):
                 except Exception:
                     pass
 
-        if show_progress and Progress is not None:
+        if progress is not None:
             try:
                 progress.stop()
             except Exception:
