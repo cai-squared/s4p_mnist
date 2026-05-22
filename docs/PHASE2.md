@@ -271,6 +271,7 @@ install(show_locals=True)
 ```
 
 ![Terminal logging output with rich colors and progress bar](../reports/figures/terminal_logging.png)
+*Figure 3: Rich-enhanced terminal logging during model training, showing colored log levels, epoch/batch progress bars, training status updates, and experiment lifecycle events.*
 
 ## 6. Configuration Management
 
