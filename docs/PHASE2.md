@@ -217,7 +217,6 @@ timestamp | level | module | message
 
 Example training output:
 
-```
 2026-05-21 13:40:29 | INFO     | s4p_mnist.train_model | W&B run initialized: mode=online name=logical-blaze-49
 2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loading processed arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
 2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST: train=(60000, 28, 28), test=(10000, 28, 28)
@@ -231,18 +230,16 @@ Example training output:
 2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Held-out MNIST test accuracy: 0.994900
 2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | W&B run finished
 2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | Training complete
-```
 
 Example prediction output:
 
-```
 2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Loading model from /Users/ccai/Downloads/SE 489/S4P_MNIST/models/model.joblib
 2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Scoring /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
 2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loading processed arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
 2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST: train=(60000, 28, 28), test=(10000, 28, 28)
 2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Wrote 10000 rows to /Users/ccai/Downloads/SE 489/S4P_MNIST/predictions.csv
 2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Prediction complete
-```
+
 
 **The log entries indicate:**
 - dataset loading
