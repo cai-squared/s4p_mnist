@@ -3,9 +3,9 @@
 ## 👥 Team Information
 
 - **Team Name:** S4P
-- **Team Members:** *Cai Cindy (ccai5@depaul.edu)*
-                    *Riffa Hammed (rriffaha@depaul.edu)*
-                    *Sai Subodh Gundam Raju (sgundamr@dgepaul.edu)*
+- **Team Members:** *Cai Cindy (ccai5@depaul.edu)*,
+                    *Riffa Hammed (rriffaha@depaul.edu)*,
+                    *Sai Subodh Gundam Raju (sgundamr@dgepaul.edu)*,
                     *Saumyaa Kannan (skannan3@depaul.edu)*
 - **Course & Section:** SE489 ML ENGINEERING FOR PRODUCTION
                         Section:(930 Online: Sync - 910 Online: Async)
@@ -22,9 +22,9 @@ demonstrates a complete ML project lifecycle from raw data ingestion through
 to a scalable, monitored, and user-accessible deployment.
 
 🎯 **Key Objectives:**
-- [ ] 🔬 Design and train a high-accuracy digit classification model with fully
+- [x] 🔬 Design and train a high-accuracy digit classification model with fully
       reproducible data processing and experiment tracking
-- [ ] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
+- [x] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
       to ensure consistent, scalable execution
 - [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
@@ -62,7 +62,7 @@ flowchart TD
 ### Prerequisites
 - Python 3.11+ installed
 - Git installed
-- (Optional) Docker and Docker Compose
+- Docker Desktop (for containerized execution)
 
 ### Installation
 
@@ -121,6 +121,28 @@ If you typo something like `training.epochs=0`, it errors out immediately instea
 
 More detail is in `configs/README.md` and `docs/PHASE2.md` section 6.
 
+### Logging (Phase 2)
+
+Logs are written to both the terminal (colored via `rich`) and `logs/s4p_mnist.log` (rotating file).
+
+```bash
+# View live logs during training
+tail -f logs/s4p_mnist.log
+```
+
+### WandB Experiment Tracking (Phase 2)
+
+```bash
+# Login once
+wandb login
+
+# Training auto-logs to W&B (enabled by default)
+make train
+
+# Disable W&B if needed
+python -m s4p_mnist.train_model training.wandb=false
+```
+
 ---
 ## Technology Stack
 
@@ -138,6 +160,9 @@ More detail is in `configs/README.md` and `docs/PHASE2.md` section 6.
 ### Configuration Management
 - **hydra-core** >= 1.3.0 - Hydra configuration framework
 - **omegaconf** >= 2.3.0 - Hierarchical configuration
+### Logging & Monitoring
+- **rich** >= 13.0.0 - Colored terminal output, progress bars, pretty tracebacks
+- **wandb** >= 0.18.0 - Weights & Biases experiment tracking and system monitoring
 ### Data Version Control
 - **dvc** >= 3.55.0 - Data Version Control
 ---
@@ -263,12 +288,31 @@ make docker_run
 make docs
 ```
 ---
+## Troubleshooting
+
+- Ensure Docker Desktop is running before `make docker_run`
+- Set `WANDB_API_KEY` before enabling WandB logging
+- Run `make data` if processed arrays are missing
+- Apple Silicon users should verify PyTorch MPS support
+
+---
 ## Contribution Summary
 
-- **Cindy Cai** — Data exploration, EDA notebook, code review
-- **Riffa Hammed** — Data pipeline (raw MNIST IDX files → processed .npy arrays)
-- **Sai Subodh Gundam Raju** — Model development and training (six algorithms including CNN, ~99.5% accuracy); Hydra config for training and prediction CLIs (Phase 2)
-- **Saumyaa Kannan** — Project documentation (README, PHASE1.md, project description)
+- **Cindy Cai** - Data exploration, EDA notebook, code review; 
+  Docker containerization (Dockerfile, build/run instructions, environment consistency) (Phase 2);
+  Profiling & optimization (cProfile, PyTorch Profiler, MPS device support) (Phase 2)
+
+- **Riffa Hammed** - Data pipeline (raw MNIST IDX files → processed .npy arrays);
+  WandB experiment tracking and system monitoring (Phase 2);
+  Monitoring & debugging (pdb/ipdb, debug scenarios, model assertion checks) (Phase 2)
+
+- **Sai Subodh Gundam Raju** - Model development and training (six algorithms including CNN, ~99.5% accuracy);
+  Hydra configuration management (train and predict CLIs, config validation) (Phase 2)
+
+- **Saumyaa Kannan** - Project documentation (README, PHASE1.md, project description);
+  Application logging setup with rich+logging (Phase 2);
+  PHASE2.md documentation and README updates (Phase 2)
+  
 ---
 ## References
 
