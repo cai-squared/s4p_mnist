@@ -87,6 +87,11 @@ class Model(BaseModel):
         return torch.device("cpu")
 
     @staticmethod
+    def _is_docker() -> bool:
+        """Check if running inside a Docker container."""
+        return Path("/.dockerenv").exists()
+
+    @staticmethod
     def _prepare_x(X: np.ndarray) -> torch.Tensor:
         x = np.asarray(X, dtype=np.float32)
         if x.ndim == 2 and x.shape[1] == 784:
@@ -189,6 +194,8 @@ class Model(BaseModel):
         best_state: dict[str, torch.Tensor] | None = None
 
         out_dir = Path(self.config.get("out_dir", ""))
+        if out_dir != Path(""):
+            out_dir.mkdir(parents=True, exist_ok=True)
 
         # Optionally display a Rich progress UI for epochs and batches
         if show_progress and Progress is not None:
@@ -210,35 +217,55 @@ class Model(BaseModel):
             batch_task = None
 
         for epoch in range(epochs):
-            if epoch == 0:
+            if epoch == 0 and not self._is_docker():
+                # Only profile on first epoch, and only outside Docker
                 # update batch task total before running epoch
                 if progress is not None and batch_task is not None:
                     progress.update(batch_task, total=len(train_loader), completed=0)
 
-                with profile(
-                    activities=[ProfilerActivity.CPU],
-                    record_shapes=False,
-                    profile_memory=False,
-                    with_stack=False,
-                ) as prof:
-                    with record_function("train_epoch"):
-                        self._train_epoch(
-                            train_loader,
-                            optimizer,
-                            criterion,
-                            device,
-                            progress=progress,
-                            batch_task_id=batch_task,
-                        )
+                try:
+                    with profile(
+                        activities=[ProfilerActivity.CPU],
+                        record_shapes=False,
+                        profile_memory=False,
+                        with_stack=False,
+                    ) as prof:
+                        with record_function("train_epoch"):
+                            self._train_epoch(
+                                train_loader,
+                                optimizer,
+                                criterion,
+                                device,
+                                progress=progress,
+                                batch_task_id=batch_task,
+                            )
 
-                with open(out_dir / "profile.txt", "w") as f:
-                    f.write(
-                        prof.key_averages().table(
-                            sort_by="self_cpu_time_total", row_limit=30
-                        )
+                    if out_dir != Path(""):
+                        try:
+                            with open(out_dir / "profile.txt", "w") as f:
+                                f.write(
+                                    prof.key_averages().table(
+                                        sort_by="self_cpu_time_total", row_limit=30
+                                    )
+                                )
+                        except Exception:
+                            pass  # Silently skip profiling output if write fails
+                except Exception:
+                    # Profiler may fail; train without profiling
+                    self._train_epoch(
+                        train_loader,
+                        optimizer,
+                        criterion,
+                        device,
+                        progress=progress,
+                        batch_task_id=batch_task,
                     )
 
             else:
+                # update batch task total before running epoch
+                if progress is not None and batch_task is not None and epoch == 0:
+                    progress.update(batch_task, total=len(train_loader), completed=0)
+
                 self._train_epoch(
                     train_loader,
                     optimizer,
