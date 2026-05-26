@@ -1,87 +1,59 @@
-# Phase 3: Evaluation and Deployment
+# Phase 3: Continuous Machine Learning (CML) and Deployment
 
 ## Overview
-This phase covers final evaluation, testing, and deployment preparation of the model.
 
-## Objectives
+## 1. Continuous Integration & Testing
 
-- [ ] Final model evaluation on test set
-- [ ] Production readiness assessment
-- [ ] Documentation and knowledge transfer
-- [ ] Deployment pipeline setup
-- [ ] Monitoring and maintenance plan
+### 1.1 Unit Testing with pytest
+### 1.2 GitHub Actions CI Workflow
+### 1.3 Pre-commit Hooks
 
-## Deliverables
+## 2. Continuous Docker Building & CML
 
-### 1. Final Evaluation Report
-- Test set performance
-- Model robustness analysis
-- Edge case testing
-- Performance summary
+### 2.1 Automated Docker Builds
 
-### 2. Deployment Artifacts
-- Docker image created and tested
-- Docker Compose configuration
-- Container specifications documented
-- API/inference server ready
-- Configuration files documented
+Docker builds are automated with this [GitHub Workflow](../.github/workflows/docker.yml). With every commit to main, the image will be built and pushed to the caisquared/s4p_mnist repository on Docker Hub.
 
-### 3. Documentation
-- User guide for running predictions
-- API documentation
-- Deployment instructions
-- Troubleshooting guide
-- Model card
+![Screenshot of Docker Hub repository](../reports/figures/docker_hub.png)
+*Figure 1: Docker Hub repository caisquared/s4p_mnist with the latest image.*
 
-### 4. Monitoring and Maintenance
-- Performance monitoring plan
-- Model update strategy
-- Data drift detection approach
-- Feedback loop design
+To pull the docker image, run
 
-## Test Results
+```
+docker pull caisquared/s4p_mnist:latest
+ ```
 
-*To be filled in during Phase 3*
+if you're running on a mac you can use the `--platform linux/amd64` flag.
 
-### Final Performance Metrics
-- Test Accuracy: 
-- Test Loss: 
-- Other Metrics: 
+To run the docker image, run
 
-## Deployment Plan
+```
+docker run -it --rm \
+    -e WANDB_API_KEY=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 \
+    -v "$(PWD)/data:/app/data" \
+    -v "$(PWD)/models:/app/models" \
+    caisquared/s4p_mnist:latest
+```
 
-*To be filled in during Phase 3*
+### 2.2 Continuous Machine Learning (CML)
 
-### Deployment Environment
-- Platform: 
-- Configuration: 
-- Expected Latency: 
-- Resource Requirements: 
+## 3. Deployment on Google Cloud Platform (GCP)
 
-## Known Limitations
+### 3.1 GCP Artifact Registry
+### 3.2 Custom Training Job on GCP
+### 3.3 FastAPI + GCP Cloud Functions
+### 3.4 Dockerize & Deploy with GCP Cloud Run
 
-*To be filled in during Phase 3*
+## 4. Interactive UI
 
-## Future Improvements
+### 4.1 Streamlit or Gradio app on Hugging Face Spaces
 
-- [ ] Improvement 1
-- [ ] Improvement 2
-- [ ] Improvement 3
+## 5. End-to-End Demo Recording
 
-## Handoff Checklist
+### 5.1 Recording in main README
 
-- [ ] All code documented and commented
-- [ ] Tests passing (100% coverage)
-- [ ] Docker image tested
-- [ ] Documentation complete
-- [ ] Model versioning implemented
-- [ ] Performance monitoring set up
-- [ ] Deployment runbook created
-- [ ] Team training completed
+## 6. Documentation, Repository Updates & Cleanup
 
-## Status
-
-- Start Date: 
-- Estimated Completion: 
-- Actual Completion: 
-- Status: Not Started
+### 6.1 Comprehensive README
+### 6.2 PHASE3.md
+### 6.3 GCP Resource Cleanup

@@ -56,6 +56,7 @@ flowchart TD
 
 ### Phase 3: CI/CD & Deployment
 - See [PHASE3.md](PHASE3.md) for detailed checklist
+- See [docs/PHASE3.md](docs/PHASE3.md) for phase documentation.
 ---
 ## Setup Instructions
 
@@ -298,7 +299,7 @@ make docs
 ---
 ## Contribution Summary
 
-- **Cindy Cai** - Data exploration, EDA notebook, code review; 
+- **Cindy Cai** - Data exploration, EDA notebook, code review;
   Docker containerization (Dockerfile, build/run instructions, environment consistency) (Phase 2);
   Profiling & optimization (cProfile, PyTorch Profiler, MPS device support) (Phase 2)
 
@@ -312,7 +313,7 @@ make docs
 - **Saumyaa Kannan** - Project documentation (README, PHASE1.md, project description);
   Application logging setup with rich+logging (Phase 2);
   PHASE2.md documentation and README updates (Phase 2)
-  
+
 ---
 ## References
 
