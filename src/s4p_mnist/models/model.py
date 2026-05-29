@@ -1,16 +1,39 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import joblib
 import numpy as np
 import torch
 from torch import nn
 from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.profiler import ProfilerActivity, profile, record_function
 from torch.utils.data import DataLoader, TensorDataset
 
 from s4p_mnist.models.base import BaseModel
+
+try:
+    # Import Rich progress only when available; keep optional so imports don't fail
+    from rich.progress import (
+        BarColumn,
+        Progress,
+        SpinnerColumn,
+        TextColumn,
+        TimeElapsedColumn,
+        TimeRemainingColumn,
+    )
+except Exception:  # pragma: no cover - optional dependency
+    Progress = None  # type: ignore
+
+# Provide a static typing alias so Pylance/typing tools can resolve the
+# `Progress` type without requiring `rich` at runtime.
+if TYPE_CHECKING:
+    from rich.progress import Progress as RichProgress  # type: ignore
+    from rich.progress import TaskID as RichTaskID  # type: ignore
+else:
+    RichProgress = Any  # type: ignore
+    RichTaskID = Any  # type: ignore
 
 _BUNDLE_KIND = "s4p_mnist_torch_cnn_v1"
 
@@ -57,7 +80,16 @@ class Model(BaseModel):
         self._fitted = False
 
     def _device(self) -> torch.device:
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            return torch.device("mps")
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        return torch.device("cpu")
+
+    @staticmethod
+    def _is_docker() -> bool:
+        """Check if running inside a Docker container."""
+        return Path("/.dockerenv").exists()
 
     @staticmethod
     def _prepare_x(X: np.ndarray) -> torch.Tensor:
@@ -80,7 +112,32 @@ class Model(BaseModel):
             torch.from_numpy(np.ascontiguousarray(x)),
         )
 
-    def fit(self, X: Any, y: Any) -> Model:
+    def _train_epoch(
+        self,
+        train_loader: DataLoader,
+        optimizer: torch.optim.Optimizer,
+        criterion: nn.Module,
+        device: torch.device,
+        progress: RichProgress | None = None,
+        batch_task_id: RichTaskID | None = None,
+    ) -> None:
+        self._net.train()
+        non_blocking = device.type == "cuda"
+        for xb, yb in train_loader:
+            xb = xb.to(device, non_blocking=non_blocking)
+            yb = yb.to(device, non_blocking=non_blocking)
+            optimizer.zero_grad(set_to_none=True)
+            logits = self._net(xb)
+            loss = criterion(logits, yb)
+            loss.backward()
+            optimizer.step()
+            if progress is not None and batch_task_id is not None:
+                try:
+                    progress.advance(batch_task_id)
+                except Exception:
+                    pass
+
+    def fit(self, X: Any, y: Any, *, show_progress: bool = False) -> Model:
         if not isinstance(X, np.ndarray):
             raise TypeError("X must be a numpy.ndarray of pixels.")
         if not isinstance(y, np.ndarray):
@@ -135,25 +192,99 @@ class Model(BaseModel):
 
         best_val = -1.0
         best_state: dict[str, torch.Tensor] | None = None
-        for _ in range(epochs):
-            self._net.train()
-            for xb, yb in train_loader:
-                xb = xb.to(device, non_blocking=True)
-                yb = yb.to(device, non_blocking=True)
-                optimizer.zero_grad(set_to_none=True)
-                logits = self._net(xb)
-                loss = criterion(logits, yb)
-                loss.backward()
-                optimizer.step()
+
+        out_dir = Path(self.config.get("out_dir", ""))
+        if out_dir != Path(""):
+            out_dir.mkdir(parents=True, exist_ok=True)
+
+        # Optionally display a Rich progress UI for epochs and batches
+        if show_progress and Progress is not None:
+            progress = Progress(
+                SpinnerColumn(),
+                TextColumn("{task.description}"),
+                BarColumn(),
+                TextColumn("{task.completed}/{task.total}"),
+                TimeElapsedColumn(),
+                TimeRemainingColumn(),
+                transient=True,
+            )
+            progress.start()
+            epoch_task = progress.add_task("Epochs", total=epochs)
+            batch_task = progress.add_task("Batches", total=0)
+        else:
+            progress = None
+            epoch_task = None
+            batch_task = None
+
+        for epoch in range(epochs):
+            if epoch == 0 and not self._is_docker():
+                # Only profile on first epoch, and only outside Docker
+                # update batch task total before running epoch
+                if progress is not None and batch_task is not None:
+                    progress.update(batch_task, total=len(train_loader), completed=0)
+
+                try:
+                    with profile(
+                        activities=[ProfilerActivity.CPU],
+                        record_shapes=False,
+                        profile_memory=False,
+                        with_stack=False,
+                    ) as prof:
+                        with record_function("train_epoch"):
+                            self._train_epoch(
+                                train_loader,
+                                optimizer,
+                                criterion,
+                                device,
+                                progress=progress,
+                                batch_task_id=batch_task,
+                            )
+
+                    if out_dir != Path(""):
+                        try:
+                            with open(out_dir / "profile.txt", "w") as f:
+                                f.write(
+                                    prof.key_averages().table(
+                                        sort_by="self_cpu_time_total", row_limit=30
+                                    )
+                                )
+                        except Exception:
+                            pass  # Silently skip profiling output if write fails
+                except Exception:
+                    # Profiler may fail; train without profiling
+                    self._train_epoch(
+                        train_loader,
+                        optimizer,
+                        criterion,
+                        device,
+                        progress=progress,
+                        batch_task_id=batch_task,
+                    )
+
+            else:
+                # update batch task total before running epoch
+                if progress is not None and batch_task is not None and epoch == 0:
+                    progress.update(batch_task, total=len(train_loader), completed=0)
+
+                self._train_epoch(
+                    train_loader,
+                    optimizer,
+                    criterion,
+                    device,
+                    progress=progress,
+                    batch_task_id=batch_task,
+                )
+
             scheduler.step()
 
             self._net.eval()
+            non_blocking = device.type == "cuda"
             correct = 0
             total = 0
             with torch.no_grad():
                 for xb, yb in val_loader:
-                    xb = xb.to(device, non_blocking=True)
-                    yb = yb.to(device, non_blocking=True)
+                    xb = xb.to(device, non_blocking=non_blocking)
+                    yb = yb.to(device, non_blocking=non_blocking)
                     pred = self._net(xb).argmax(dim=1)
                     correct += int((pred == yb).sum().item())
                     total += yb.size(0)
@@ -164,6 +295,18 @@ class Model(BaseModel):
                     k: v.detach().cpu().clone()
                     for k, v in self._net.state_dict().items()
                 }
+            # advance epoch progress
+            if progress is not None and epoch_task is not None:
+                try:
+                    progress.advance(epoch_task)
+                except Exception:
+                    pass
+
+        if progress is not None:
+            try:
+                progress.stop()
+            except Exception:
+                pass
 
         if best_state is not None:
             self._net.load_state_dict(best_state)
@@ -177,13 +320,17 @@ class Model(BaseModel):
         if not isinstance(X, np.ndarray):
             raise TypeError("X must be a numpy.ndarray of pixels.")
         device = self._device()
+        self._net.to(device)
         self._net.eval()
         xt = self._prepare_x(X)
         preds: list[int] = []
         batch_size = int(self.config.get("batch_size", 512))
+        non_blocking = device.type == "cuda"
         with torch.no_grad():
             for start in range(0, xt.size(0), batch_size):
-                chunk = xt[start : start + batch_size].to(device, non_blocking=True)
+                chunk = xt[start : start + batch_size].to(
+                    device, non_blocking=non_blocking
+                )
                 logits = self._net(chunk)
                 preds.extend(logits.argmax(dim=1).cpu().numpy().tolist())
         return np.asarray(preds, dtype=np.int64)
@@ -209,5 +356,6 @@ class Model(BaseModel):
         if not isinstance(state, dict):
             raise TypeError("Invalid state_dict in model file.")
         model._net.load_state_dict(state)
+        model._net.to(model._device())
         model._fitted = True
         return model

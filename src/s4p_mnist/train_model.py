@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import hydra
 import numpy as np
+import wandb
+from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 from torchvision import datasets
 
@@ -14,7 +16,30 @@ from s4p_mnist.logging_config import get_logger, setup_logging
 from s4p_mnist.models.model import Model
 from s4p_mnist.utils.seed import set_seed
 
-logger = get_logger(__name__)
+logger = get_logger("s4p_mnist.train_model")
+
+
+def _assert_no_nan(x: np.ndarray, name: str = "X") -> None:
+    """Raise AssertionError if x contains NaN or Inf values."""
+    if np.isnan(x).any():
+        raise AssertionError(f"{name} contains NaN values — check your data pipeline.")
+    if np.isinf(x).any():
+        raise AssertionError(f"{name} contains Inf values — check normalization step.")
+
+
+def _assert_shape(x: np.ndarray, y: np.ndarray) -> None:
+    """Raise AssertionError if x/y shapes are incompatible with MNIST."""
+    if x.ndim != 2 or x.shape[1] != 784:
+        raise AssertionError(
+            f"Expected x shape (N, 784), got {x.shape}. "
+            "Images must be flattened 28x28 pixels."
+        )
+    if y.ndim != 1:
+        raise AssertionError(f"Expected y shape (N,), got {y.shape}.")
+    if x.shape[0] != y.shape[0]:
+        raise AssertionError(
+            f"Sample count mismatch: x has {x.shape[0]} rows but y has {y.shape[0]}."
+        )
 
 
 def _check_train_cfg(cfg: DictConfig) -> None:
@@ -66,6 +91,8 @@ def load_training_xy(
         )
         y_arr = y_train.astype(np.int64, copy=False)
         logger.info("Loaded training from processed .npy in %s", data_path)
+        _assert_no_nan(x_arr, "X_train")
+        _assert_shape(x_arr, y_arr)
         return x_arr, y_arr
     except FileNotFoundError:
         logger.info("Processed .npy not found under %s", data_path)
@@ -82,6 +109,8 @@ def load_training_xy(
     )
     x_arr = raw.data.numpy().astype(np.float32).reshape(-1, 784) / 255.0
     y_arr = raw.targets.numpy().astype(np.int64, copy=False)
+    _assert_no_nan(x_arr, "X_train")
+    _assert_shape(x_arr, y_arr)
     return x_arr, y_arr
 
 
@@ -96,7 +125,31 @@ def train(
     val_fraction: float,
     weight_decay: float,
     dropout: float,
+    out_dir: Path,
+    use_wandb: bool = True,
 ) -> None:
+    cfg: dict[str, Any] = {
+        "epochs": epochs,
+        "batch_size": batch_size,
+        "learning_rate": lr,
+        "weight_decay": weight_decay,
+        "dropout": dropout,
+        "val_fraction": val_fraction,
+        "seed": seed,
+    }
+
+    wandb_mode: Literal["online", "disabled"] = "online" if use_wandb else "disabled"
+    run = wandb.init(
+        entity="rriffaha-",
+        project="s4p-mnist",
+        config=cfg,
+        job_type="train",
+        mode=wandb_mode,
+    )
+    logger.info("W&B run initialized: mode=%s name=%s", wandb_mode, run.name)
+
+    cfg["out_dir"] = str(out_dir)
+
     model_dir.mkdir(parents=True, exist_ok=True)
     x_train, y_train = load_training_xy(data_path, download=True)
     logger.info(
@@ -107,17 +160,9 @@ def train(
         lr,
     )
 
-    cfg: dict[str, Any] = {
-        "epochs": epochs,
-        "batch_size": batch_size,
-        "learning_rate": lr,
-        "weight_decay": weight_decay,
-        "dropout": dropout,
-        "val_fraction": val_fraction,
-        "seed": seed,
-    }
     model = Model(cfg)
-    model.fit(x_train, y_train)
+    model.fit(x_train, y_train, show_progress=True)
+    logger.info("Finished training model for %d epochs", epochs)
 
     out_path = model_dir / "model.joblib"
     model.save(out_path)
@@ -148,6 +193,21 @@ def train(
     logger.info("Held-out MNIST test accuracy: %.6f", acc)
     print(f"cnn_mnist_test_accuracy={acc:.6f}")
 
+    wandb.log({"test_accuracy": acc})
+    wandb.summary["test_accuracy"] = acc
+
+    artifact = wandb.Artifact(
+        name="s4p-mnist-model",
+        type="model",
+        description="Trained CNN on MNIST",
+        metadata={"test_accuracy": acc, **cfg},
+    )
+    artifact.add_file(str(out_path))
+    run.log_artifact(artifact)
+
+    run.finish()
+    logger.info("W&B run finished")
+
 
 def _resolve_under_root(rel: str) -> Path:
     p = Path(rel)
@@ -159,12 +219,15 @@ def main(cfg: DictConfig) -> None:
     _check_train_cfg(cfg)
     setup_logging()
 
-    data_path = _resolve_under_root(str(cfg.paths.data_processed))
-    model_dir = _resolve_under_root(str(cfg.paths.models_dir))
     t = cfg.training
     d = cfg.data
 
     set_seed(int(t.seed))
+
+    data_path = _resolve_under_root(str(cfg.paths.data_processed))
+    model_dir = _resolve_under_root(str(cfg.paths.models_dir))
+
+    out_dir = Path(HydraConfig.get().runtime.output_dir)
 
     train(
         data_path,
@@ -176,6 +239,8 @@ def main(cfg: DictConfig) -> None:
         val_fraction=float(d.val_fraction),
         weight_decay=float(t.weight_decay),
         dropout=float(t.dropout),
+        out_dir=out_dir,
+        use_wandb=t.wandb,
     )
     logger.info("Training complete")
 
