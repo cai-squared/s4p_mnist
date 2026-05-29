@@ -1,4 +1,4 @@
-.PHONY: install dev data train predict test lint format clean docker_build docker_run docs
+.PHONY: install dev data train predict test lint format clean docker_build docker_run serve docs
 
 # Note: 'uv' is a faster alternative to pip. Install with: pip install uv
 # Then replace 'pip install' with 'uv pip install' in the commands below.
@@ -50,6 +50,9 @@ docker_run:
 		-v "$(PWD)/data:/app/data" \
 		-v "$(PWD)/models:/app/models" \
 		s4p_mnist:latest
+
+serve:
+	uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 docs:
 	mkdocs serve
