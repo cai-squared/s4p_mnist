@@ -60,7 +60,13 @@ Code is in `api/main.py` and `api/schemas.py` as in the course template.
 | POST `/predict/grid` | Sends a 28 by 28 grid |
 | POST `/predict/image` | Upload a small image; server resizes to 28x28 |
 
-Local test: `make serve` then open `http://127.0.0.1:8000/docs`.
+Local test on Windows:
+
+```
+py -3.11 -m uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Then open `http://127.0.0.1:8000/docs`. A test upload of `reports/figures/test_digit_upload.png` returned digit 7 with about 99.99% confidence.
 
 ### 3.4 Cloud Run
 

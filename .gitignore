@@ -127,11 +127,14 @@ data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+data/MNIST/
+
 
 # Models
 models/*.pt
 models/*.pkl
 models/*.h5
+models/*.joblib
 !models/.gitkeep
 
 # IDEs
@@ -147,3 +150,9 @@ Thumbs.db
 
 # Project specific
 config/local_settings.py
+
+# Weights & Biases local run cache
+wandb/
+
+# Hydra outputs
+outputs/

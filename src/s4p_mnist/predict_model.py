@@ -11,7 +11,7 @@ from s4p_mnist.data.loaders import load_processed
 from s4p_mnist.logging_config import get_logger, setup_logging
 from s4p_mnist.models.model import Model
 
-logger = get_logger(__name__)
+logger = get_logger("s4p_mnist.predict_model")
 
 
 def _check_predict_cfg(cfg: DictConfig) -> None:
