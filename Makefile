@@ -1,4 +1,4 @@
-.PHONY: install dev data train predict test lint format clean docker_build docker_run docs
+.PHONY: install dev data train predict test lint format clean docker_build docker_run serve docs
 
 # Note: 'uv' is a faster alternative to pip. Install with: pip install uv
 # Then replace 'pip install' with 'uv pip install' in the commands below.
@@ -46,9 +46,17 @@ docker_build:
 
 docker_run:
 	docker run -it --rm \
+		-e WANDB_API_KEY=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 \
 		-v "$(PWD)/data:/app/data" \
 		-v "$(PWD)/models:/app/models" \
 		s4p_mnist:latest
 
+serve:
+	uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
 docs:
 	mkdocs serve
+
+profile:
+	python -m cProfile -o stats.prof src/s4p_mnist/train_model.py
+	snakeviz stats.prof

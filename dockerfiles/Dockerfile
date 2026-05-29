@@ -24,13 +24,14 @@ COPY --from=builder /usr/local /usr/local
 # Set environment variables
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONUNBUFFERED=1
+ENV S4P_SERVE=0
+ENV PORT=8080
+ENV S4P_MODEL_PATH=/app/models/model.joblib
 
-# Copy project code
 COPY . .
 
-# Install the package
 RUN pip install --no-cache-dir -e .
 
-EXPOSE 8000
+EXPOSE 8080
 
-ENTRYPOINT ["sh", "-u", "flow.sh"]
+CMD ["sh", "-c", "if [ \"$S4P_SERVE\" = \"1\" ]; then exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT}; else exec sh -u flow.sh; fi"]
