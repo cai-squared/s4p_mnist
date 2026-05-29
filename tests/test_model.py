@@ -124,3 +124,22 @@ class TestHydraConfigChecks:
         cfg = OmegaConf.create({"paths": {}, "data": {}, "training": {}})
         with pytest.raises(ValueError):
             predict_mod._check_predict_cfg(cfg)
+
+
+class TestApi:
+    def test_health_without_weights(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        import api.main as api_main
+
+        monkeypatch.setenv("S4P_SKIP_MODEL_LOAD", "1")
+        monkeypatch.setenv("S4P_MODEL_PATH", str(tmp_path / "missing.joblib"))
+        api_main._model = None
+        from fastapi.testclient import TestClient
+
+        client = TestClient(api_main.app)
+        out = client.get("/health")
+        assert out.status_code == 200
+        body = out.json()
+        assert body["status"] == "ok"
+        assert body["model_loaded"] is False

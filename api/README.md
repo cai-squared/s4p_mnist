@@ -11,8 +11,10 @@ Store FastAPI application code and REST API endpoints here.
 ## Usage
 
 ```bash
-# Run development server
-uvicorn s4p_mnist.api.main:app --reload
+pip install -r requirements.txt
+pip install -e .
+make train
+make serve
 ```
 
 ## Phase
