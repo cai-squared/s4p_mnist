@@ -4,9 +4,90 @@
 
 ## 1. Continuous Integration & Testing
 
+
 ### 1.1 Unit Testing with pytest
+
+**File:** `tests/test_data.py`
+
+Tests cover the entire data layer: the IDX binary parser (`src/s4p_mnist/data/loaders.py`) and the pipeline CLI (`src/s4p_mnist/data/make_dataset.py`). The 34 tests are organized into 8 classes:
+
+| Class | What it tests |
+|-------|--------------|
+| `TestReadIdxImages` | IDX3 parser: shape, dtype, value roundtrip, missing file, bad magic, truncated header, body mismatch |
+| `TestReadIdxLabels` | IDX1 parser: same coverage as images |
+| `TestLoadRaw` | All four array shapes/dtypes, train/test size mismatch, label out of range, missing file |
+| `TestSaveAndLoadProcessed` | File creation, value/dtype roundtrip, missing files error with `make data` hint, auto-creates directory |
+| `TestProcessedFilesExist` | All present, empty dir, partial presence |
+| `TestMakeDataset` | Creates files, idempotent (no-force skips), force triggers reprocessing, missing raw raises |
+| `TestMain` | CLI exit codes 0/1, `--force` flag accepted |
+
+All tests are self-contained: synthetic IDX binary files are generated on the fly using pytest's `tmp_path` fixture so the real MNIST data files are never required in CI.
+
+To run locally:
+
+```
+uv run pytest tests/test_data.py -v
+```
+
+![34 tests passing](../reports/figures/pytest_34_passed.png)
+*Figure: All 34 data layer tests passing locally (Python 3.11.9, pytest 9.0.3).*
+
+---
+
 ### 1.2 GitHub Actions CI Workflow
+
+**File:** `.github/workflows/ci.yml`
+
+The CI workflow triggers on every push and pull request to `main` and runs the following steps against Python 3.11:
+
+1. Install dependencies from `requirements.txt` and `requirements_dev.txt`
+2. `ruff check .` — lint
+3. `ruff format --check .` — format check
+4. `pip install -e .` — install the project package
+5. `mypy src/s4p_mnist` — static type checking
+6. `pytest tests/ --cov=s4p_mnist --cov-report=xml` — run all tests with coverage
+7. Upload coverage report to Codecov
+
+The workflow ensures that every PR to `main` is lint-clean, type-safe, and fully tested before merging.
+
+![CI green on PR #18](../reports/figures/ci_green_pr18.png)
+
+*Figure: Both CI checks green on PR #18 — lint-and-test (3.11) and build-and-push.*
+
+---
+
 ### 1.3 Pre-commit Hooks
+
+**File:** `.pre-commit-config.yaml`
+
+Pre-commit hooks enforce code quality before any commit lands. Three hook sets are active:
+
+| Hook | What it enforces |
+|------|-----------------|
+| `ruff` (with `--fix`) | Auto-fixes lint errors on commit |
+| `ruff-format` | Consistent code formatting |
+| `mypy` | Type checking with `--ignore-missing-imports` |
+| `trailing-whitespace` | No trailing spaces |
+| `end-of-file-fixer` | Files end with a newline |
+| `check-yaml` | Valid YAML syntax |
+
+To install the hooks in your local clone:
+
+```
+pip install pre-commit
+pre-commit install
+```
+
+After installation, every `git commit` runs the checks automatically. To run manually against all files:
+
+```
+pre-commit run --all-files
+```
+
+![Pre-commit config](../reports/figures/pre_commit_config.png)
+*Figure: `.pre-commit-config.yaml` at repo root with ruff, mypy, and standard hooks.*
+
+---
 
 ## 2. Continuous Docker Building & CML
 
