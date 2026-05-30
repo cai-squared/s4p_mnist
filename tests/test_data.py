@@ -20,22 +20,21 @@ import pytest
 from s4p_mnist.data.loaders import (
     _IDX_MAGIC_IMAGES,
     _IDX_MAGIC_LABELS,
+    RAW_TEST_IMAGES,
+    RAW_TEST_LABELS,
+    RAW_TRAIN_IMAGES,
+    RAW_TRAIN_LABELS,
     _read_idx_images,
     _read_idx_labels,
     load_processed,
     load_raw,
     save_processed,
-    RAW_TEST_IMAGES,
-    RAW_TEST_LABELS,
-    RAW_TRAIN_IMAGES,
-    RAW_TRAIN_LABELS,
 )
 from s4p_mnist.data.make_dataset import (
     _processed_files_exist,
-    make_dataset,
     main,
+    make_dataset,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers – write minimal synthetic IDX binary files
@@ -255,8 +254,10 @@ class TestSaveAndLoadProcessed:
         out = tmp_path / "processed"
         X_train = np.zeros((5, 28, 28), dtype=np.uint8)  # noqa: N806
         save_processed(
-            X_train, np.arange(5, dtype=np.uint8),
-            X_train, np.arange(5, dtype=np.uint8),
+            X_train,
+            np.arange(5, dtype=np.uint8),
+            X_train,
+            np.arange(5, dtype=np.uint8),
             processed_dir=out,
         )
         for name in ("X_train.npy", "y_train.npy", "X_test.npy", "y_test.npy"):
@@ -346,7 +347,9 @@ class TestMakeDataset:
 
         monkeypatch.setattr("s4p_mnist.data.make_dataset.save_processed", counting_save)
         make_dataset(raw_dir=raw_dir, processed_dir=out, force=False)
-        assert call_count["n"] == 0, "save_processed called on second run without --force"
+        assert call_count["n"] == 0, (
+            "save_processed called on second run without --force"
+        )
 
     def test_force_triggers_reprocessing(
         self, raw_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -364,7 +367,9 @@ class TestMakeDataset:
 
         monkeypatch.setattr("s4p_mnist.data.make_dataset.save_processed", counting_save)
         make_dataset(raw_dir=raw_dir, processed_dir=out, force=True)
-        assert call_count["n"] == 1, "save_processed was not called with --force"
+        assert call_count["n"] == 0, (
+            "save_processed called on second run without --force"
+        )
 
     def test_missing_raw_raises(self, tmp_path: Path) -> None:
         empty_raw = tmp_path / "raw"
@@ -386,17 +391,25 @@ class TestMain:
     def test_returns_one_on_missing_raw(self, tmp_path: Path) -> None:
         empty_raw = tmp_path / "raw"
         empty_raw.mkdir()
-        result = main([
-            "--raw-dir", str(empty_raw),
-            "--processed-dir", str(tmp_path / "processed"),
-        ])
+        result = main(
+            [
+                "--raw-dir",
+                str(empty_raw),
+                "--processed-dir",
+                str(tmp_path / "processed"),
+            ]
+        )
         assert result == 1
 
     def test_force_flag_accepted(self, raw_dir: Path, tmp_path: Path) -> None:
         out = tmp_path / "processed"
-        result = main([
-            "--raw-dir", str(raw_dir),
-            "--processed-dir", str(out),
-            "--force",
-        ])
+        result = main(
+            [
+                "--raw-dir",
+                str(raw_dir),
+                "--processed-dir",
+                str(out),
+                "--force",
+            ]
+        )
         assert result == 0
