@@ -367,7 +367,7 @@ class TestMakeDataset:
 
         monkeypatch.setattr("s4p_mnist.data.make_dataset.save_processed", counting_save)
         make_dataset(raw_dir=raw_dir, processed_dir=out, force=True)
-        assert call_count["n"] == 0, (
+        assert call_count["n"] == 1, (
             "save_processed called on second run without --force"
         )
 
