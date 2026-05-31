@@ -96,7 +96,7 @@ pre-commit run --all-files
 Docker builds are automated with this [GitHub Workflow](../.github/workflows/docker.yml). With every commit to main, the image will be built and pushed to the caisquared/s4p_mnist repository on Docker Hub.
 
 ![Screenshot of Docker Hub repository](../reports/figures/docker_hub.png)
-*Figure 1: Docker Hub repository caisquared/s4p_mnist with the latest image.*
+*Figure: Docker Hub repository caisquared/s4p_mnist with the latest image.*
 
 To pull the docker image, run
 
@@ -117,6 +117,13 @@ docker run -it --rm \
 ```
 
 ### 2.2 Continuous Machine Learning (CML)
+
+CML is integrated in this [GitHub Workflow](../.github/workflows/cml.yml) so that a PR triggers a model training and posts a comment back on the PR with a link to the W&B run, the classification report, and the confusion matrix.
+
+An example PR is at this link: [PR 23](https://github.com/cai-squared/s4p_mnist/pull/23)
+
+![Screenshot of the PR comment](../reports/figures/pr_comment.png)
+*Figure: PR comment with W&B link and classification report visible.*
 
 ## 3. Deployment on Google Cloud Platform (GCP)
 
