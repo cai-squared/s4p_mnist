@@ -221,6 +221,7 @@ def train(
     )
     artifact.add_file(str(out_path))
     run.log_artifact(artifact)
+    artifact.wait()
 
     run_url = getattr(run, "url", None)
     with open("wandb_report.md", "w", encoding="utf-8") as wb:
