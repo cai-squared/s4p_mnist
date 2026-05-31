@@ -1,0 +1,61 @@
+name: Continuous Machine Learning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Required so the bot can post the PR comment using GITHUB_TOKEN.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  train-and-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.11
+        run: uv python install 3.11
+
+      - name: Set up CML
+        uses: iterative/setup-cml@v2
+
+      - name: Install dependencies
+        run: uv pip install --system -e .
+
+      - name: Train model
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: python src/s4p_mnist/train_model.py
+
+      - name: Write CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Model performance report" > report.md
+          echo "" >> report.md
+          echo "### W&B tracking" >> report.md
+          if [ -f wandb_report.md ]; then
+            cat wandb_report.md >> report.md
+            echo "" >> report.md
+          else
+            echo "W&B run metadata unavailable." >> report.md
+            echo "" >> report.md
+          fi
+          echo "### Classification report" >> report.md
+          echo '```' >> report.md
+          cat classification_report.txt >> report.md
+          echo '```' >> report.md
+          echo "" >> report.md
+          echo "### Confusion matrix" >> report.md
+          echo '![](./confusion_matrix.png)' >> report.md
+          cml comment create --publish report.md
