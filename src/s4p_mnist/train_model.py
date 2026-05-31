@@ -4,10 +4,16 @@ from pathlib import Path
 from typing import Any, Literal
 
 import hydra
+import matplotlib.pyplot as plt
 import numpy as np
 import wandb
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    classification_report,
+    confusion_matrix,
+)
 from torchvision import datasets
 
 from s4p_mnist.config import DATA_DIR, PROJECT_ROOT
@@ -190,6 +196,17 @@ def train(
         y_test = raw_test.targets.numpy().astype(np.int64, copy=False)
     pred = model.predict(x_test)
     acc = float((pred == y_test).mean())
+
+    report = classification_report(y_test, pred, digits=3)
+    with open("classification_report.txt", "w", encoding="utf-8") as f:
+        f.write(report)
+
+    cm = confusion_matrix(y_test, pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(range(10)))
+    fig, ax = plt.subplots(figsize=(6, 6))
+    disp.plot(ax=ax, colorbar=False)
+    fig.savefig("confusion_matrix.png", dpi=120)
+
     logger.info("Held-out MNIST test accuracy: %.6f", acc)
     print(f"cnn_mnist_test_accuracy={acc:.6f}")
 
@@ -204,6 +221,19 @@ def train(
     )
     artifact.add_file(str(out_path))
     run.log_artifact(artifact)
+
+    run_url = getattr(run, "url", None)
+    with open("wandb_report.md", "w", encoding="utf-8") as wb:
+        wb.write("### W&B run\n")
+        if run_url:
+            wb.write(f"[Open the W&B run here]({run_url})\n\n")
+        else:
+            wb.write("W&B run URL unavailable.\n\n")
+        wb.write("### W&B artifact\n")
+        wb.write(f"- name: {artifact.name}\n")
+        wb.write(f"- type: {artifact.type}\n")
+        if artifact.aliases:
+            wb.write(f"- aliases: {', '.join(artifact.aliases)}\n")
 
     run.finish()
     logger.info("W&B run finished")
