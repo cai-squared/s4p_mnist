@@ -1,7 +1,7 @@
 # PHASE 2: Enhancing ML Operations with Containerization & Monitoring
 
 ## Overview
-This phase focuses on building, training, and validating machine learning models.
+Phase 2 builds on the S4P MNIST foundation from Phase 1 by operationalizing the machine learning pipeline. This phase introduces Docker containerization for reproducible cross-environment execution, WandB-based monitoring and experiment tracking, cProfile and PyTorch Profiler for performance analysis, structured logging with Python's `logging` library and `rich` for readable terminal output, and Hydra for configuration management. By the end of this phase, the pipeline can be built into a container, tracked across experiments, debugged interactively, and configured without touching code.
 
 ## 1. Containerization
 
@@ -39,13 +39,25 @@ docker run -it --rm \
 
 ### 1.2 Environment Consistency
 
-The docker image contains all of the requirements listed in `requirements.txt`.
+The container was tested locally by running `make docker_build` followed by `make docker_run`, confirming that training and inference behave consistently with the host environment.
+
+All dependency versions are pinned in `requirements.txt` to ensure reproducible builds and consistent behavior across local and containerized environments.
 
 ## 2. Monitoring & Debugging
 
 ### 2.1 Monitoring
 
 Monitoring is done with WandB. System metrics are automatically generated.
+
+Weights & Biases (WandB) was chosen because it provides lightweight experiment monitoring, automatic system metrics tracking, GPU utilization dashboards, and collaborative experiment comparison tools with minimal setup overhead.
+
+The monitored metrics include:
+- test accuracy
+- validation accuracy
+- GPU utilization
+- GPU memory usage
+- GPU power consumption
+- runtime duration
 
 ### 2.2 Debugging Practices
 
@@ -117,6 +129,8 @@ Then inspect:
 
 **Fix:** Ensure `.reshape(X_train_img.shape[0], -1)` is called in `load_training_xy` before the assertions.
 
+Structured logging was also used during debugging to trace dataset loading, model training, evaluation, and inference workflows.
+
 ## 3. Profiling & Optimization
 
 ### 3.1 Python-level Profiling
@@ -125,7 +139,7 @@ cProfile is used to profile the training script. To profile, run `make profile`.
 
 ### 3.2 Framework Profiling
 
-PyTorch profiling is integrated into the training script. The first epoch is analyzed. Both cProfile and PyTorch profiling found that the bottleneck was in the backward pass with the model. To optimize this, the option "MPS" was given to the PyTorch device selector. Before, the device selector block looked like this:
+PyTorch profiling is integrated into the training script. The first epoch is analyzed, and profiling metrics are written to the Hydra output folder. Both cProfile and PyTorch profiling found that the bottleneck was in the backward pass with the model. To optimize this, the option "MPS" was given to the PyTorch device selector. Before, the device selector block looked like this:
 
 ```
 class Model(BaseModel):
@@ -147,13 +161,17 @@ class Model(BaseModel):
 
 This allows users on Mac computers to take advantage of GPU. On Cindy's computer, training time went from 20 minutes to 3 minutes.
 
+### 3.3 Memory Profiling
+
+Memory usage was monitored during training using PyTorch Profiler. Peak memory consumption during a training run was approximately 1.2 GB, which was within acceptable limits for the hardware used. No memory-specific optimizations were needed beyond what was already achieved by moving computation to MPS/GPU.
+
 ## 4. Experiment Management & Tracking
 
 ### 4.1 Experiment Tracking Tool
 
 Weights & Biases is integrated into the model training. It is initialized with `wandb.init()` setting `entity="rriffaha-"` and `project="s4p-mnist"`. It logs all hyperparameters (epochs, batch_size, lr, dropout, weight_decay, val_fraction, seed) automatically via the configuration dictionary.
 
-Each member of the team can run experiments on their own computers by running `wandb login` on their command line. If someone is running via docker, they can use Cindy's API key, which is listed in the docker section of this document.
+Each member of the team can run experiments on their own computers by running `wandb login` on their command line. Users running through Docker can provide their own WandB API key through the `WANDB_API_KEY` environment variable.
 
 For each experiment, WandB saves the configuration, the accuracy of the model, and the model as an artifact. Comparing runs is easy with the WandB dashboard. The final test accuracy is logged as both a metric and pinned to the run summary. The trained model is saved as a versioned W&B Artifact with hyperparameters in the metadata.
 
@@ -177,16 +195,103 @@ Three experiments were run to evaluate the effect of learning rate and dropout:
 
 Best model: `flowing-thunder-14`. The best model is saved as W&B Artifact `s4p-mnist-model:v0`. However, the improvement is negligible and may be due to random chance.
 
+### 4.3 Visualization & Sharing
+
+Teammates compared runs using the WandB dashboard and shared reports. Metrics such as accuracy, GPU utilization, runtime, and hyperparameters can be visualized side-by-side to identify the best performing experiment configurations.
+
+![WandB Experiment Comparison Report](../reports/figures/wandb_report.png)
+*Figure 1: WandB experiment comparison dashboard showing accuracy across runs.*
+
+
+![WandB System Metrics Dashboard](../reports/figures/wandb_system_metrics.png)
+*Figure 2: WandB system metrics dashboard showing GPU utilization and memory usage.*
+
 ## 5. Application & Experiment Logging
 
-logging - Saumyaa
-
 ### 5.1 Logging Setup
+
+Logs are done by a combination of Python's stdlib `logging` and `rich`. Logging is configured in `logging_config.py`. The logging level is set to INFO and there are two handlers set up: (1) a `RichHandler` for the rich-colored console output, and (2) a `RotatingFileHandler` that writes to `logs/s4p_mnist.log`.
+
+**Log format:**
+timestamp | level | module | message
+
+Example training output:
+
+```
+2026-05-21 13:40:29 | INFO     | s4p_mnist.train_model | W&B run initialized:
+mode=online name=logical-blaze-49
+2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loading processed arrays
+from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:40:29 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST:
+train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 13:40:30 | INFO     | s4p_mnist.train_model | Loaded training from
+processed .npy in /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:40:30 | INFO     | s4p_mnist.train_model | Training CNN on 60000
+samples (epochs=18 batch_size=128 lr=0.0012)
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Finished training model
+for 18 epochs
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Saved trained model to
+/Users/ccai/Downloads/SE 489/S4P_MNIST/models/model.joblib
+2026-05-21 13:43:34 | INFO     | s4p_mnist.data.loaders | Loading processed arrays
+from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:43:34 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST:
+train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Evaluating on processed
+test arrays from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 13:43:34 | INFO     | s4p_mnist.train_model | Held-out MNIST test accuracy:
+0.994900
+2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | W&B run finished
+2026-05-21 13:43:39 | INFO     | s4p_mnist.train_model | Training complete
+```
+
+Example prediction output:
+
+```
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Loading model from
+/Users/ccai/Downloads/SE 489/S4P_MNIST/models/model.joblib
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Scoring
+/Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loading processed arrays
+from /Users/ccai/Downloads/SE 489/S4P_MNIST/data/processed
+2026-05-21 14:17:28 | INFO     | s4p_mnist.data.loaders | Loaded processed MNIST:
+train=(60000, 28, 28), test=(10000, 28, 28)
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Wrote 10000 rows to
+/Users/ccai/Downloads/SE 489/S4P_MNIST/predictions.csv
+2026-05-21 14:17:28 | INFO     | s4p_mnist.predict_model | Prediction complete
+```
+
+**The log entries indicate:**
+- dataset loading
+- training initialization
+- model saving
+- evaluation progress
+- experiment tracking lifecycle events
+
+**Log levels used:**
+- `DEBUG` — internal state, array shapes (not shown in default output)
+- `INFO` — pipeline milestones: data loading, training start/end, accuracy, model save
+- `WARNING` — fallbacks, e.g. processed `.npy` not found, falling back to torchvision
+- `ERROR` — caught via `rich.traceback.install()` with full traceback and local variables
+
+Exceptions and runtime failures are logged with contextual information to simplify debugging and failure analysis.
+
 ### 5.2 Rich Output
+
+Rich has been integrated so that there are colored levels and also a progress bar during training to show completed batches and epochs.
+
+Pretty tracebacks are enabled using:
+
+```python
+from rich.traceback import install
+install(show_locals=True)
+```
+
+![Terminal logging output with rich colors and progress bar](../reports/figures/terminal_logging.png)
+*Figure 3: Rich-enhanced terminal logging during model training, showing colored log levels, epoch/batch progress bars, training status updates, and experiment lifecycle events.*
 
 ## 6. Configuration Management
 
-Hydra is now on both entry points, `train_model.py` and `predict_model.py`, with `@hydra.main` pointing at the same `configs/config.yaml` file the starter repo came with. Training parameters (epochs, batch size, lr, weight decay, dropout, seed, val split) plus the `paths` entries for processed MNIST and the `models/` folder all sit in the yaml. Prediction is configured under a `predict:` block in that same file so `predict_model` does not need its own configuration file.
+Hydra's configuration hierarchy is organized into sections on both entry points, `train_model.py` and `predict_model.py`, with `@hydra.main` pointing at the same `configs/config.yaml` file the starter repo came with. Training parameters (epochs, batch size, lr, weight decay, dropout, seed, val split) plus the `paths` entries for processed MNIST and the `models/` folder all sit in the yaml. Prediction is configured under a `predict:` block in that same file so `predict_model` does not need its own configuration file.
 
 Before either script does real work it sanity-checks the configuration (epochs at least 1, dropout between 0 and 1, val split between 0 and 1, paths not blank). `hydra.job.chdir` is false and paths still get resolved from `PROJECT_ROOT`, so Hydra's output folders get created in the project directory.
 
@@ -200,7 +305,32 @@ trains the model with the number of epochs changed to 3 and the batch size chang
 
 ## 7. Documentation & Repository Updates
 
-Saumyaa
-
 ### 7.1 Updated README
-### 7.2 PHASE2.md
+
+The base README has been updated with a Phase 2 section that links to this document and summarizes all new tools (Docker WandB, PyTorch Profiler, rich+logging, Hydra).
+
+### 7.2 Tool Integration Summary
+
+| Tool | Where used | How to use |
+|------|-----------|-----------|
+| Docker | `dockerfiles/Dockerfile` | `make docker_build && make docker_run` |
+| WandB | `train_model.py` | `make train` (auto-enabled) or `training.wandb=false` to disable |
+| PyTorch Profiler | `model.py` | Runs automatically on epoch 0, writes to Hydra output dir |
+| rich + logging | `logging_config.py` | Called via `setup_logging()` in train/predict scripts |
+| Hydra | `configs/config.yaml` | Override any param: `python -m s4p_mnist.train_model training.epochs=5` |
+
+### 7.3 Troubleshooting
+
+- Ensure Docker Desktop is running before executing `make docker_run`
+- Ensure `WANDB_API_KEY` is set before enabling WandB logging
+- If training fails with NaN values, regenerate processed data using `make data`
+- If running on Apple Silicon, ensure PyTorch MPS support is available
+
+### 7.4 PHASE2.md
+
+For phase 2, the contributions are as follows:
+
+- Cindy: Section 1 (Containerization) / Section 3 (Profiling & Optimization)
+- Subodh: Section 6 (Configuration Management)
+- Riffa: Section 2 (Monitoring & Debugging) / Section 4 (Experiment Management & Tracking)
+- Saumyaa: Section 5 (Application & Experiment Logging) / Section 7 (Documentation & Repository Updates)

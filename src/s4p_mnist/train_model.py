@@ -22,7 +22,7 @@ from s4p_mnist.logging_config import get_logger, setup_logging
 from s4p_mnist.models.model import Model
 from s4p_mnist.utils.seed import set_seed
 
-logger = get_logger(__name__)
+logger = get_logger("s4p_mnist.train_model")
 
 
 def _assert_no_nan(x: np.ndarray, name: str = "X") -> None:
@@ -167,7 +167,7 @@ def train(
     )
 
     model = Model(cfg)
-    model.fit(x_train, y_train)
+    model.fit(x_train, y_train, show_progress=True)
     logger.info("Finished training model for %d epochs", epochs)
 
     out_path = model_dir / "model.joblib"
