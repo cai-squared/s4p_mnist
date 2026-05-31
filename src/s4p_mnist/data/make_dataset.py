@@ -34,7 +34,7 @@ from s4p_mnist.data.loaders import (
 )
 from s4p_mnist.logging_config import get_logger, setup_logging
 
-logger = get_logger(__name__)
+logger = get_logger("s4p_mnist.data.make_dataset")
 
 
 def _processed_files_exist(processed_dir: Path) -> bool:

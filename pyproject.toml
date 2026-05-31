@@ -25,7 +25,12 @@ dependencies = [
     "hydra-core>=1.3.0",
     "omegaconf>=2.3.0",
     "dvc>=3.55.0",
-    "snakeviz>=2.2.2"
+    "snakeviz>=2.2.2",
+    "rich>=13.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0.0"
 ]
 
 [project.optional-dependencies]
@@ -41,7 +46,7 @@ dev = [
 line-length = 88
 target-version = "py311"
 # EDA notebook: not linted like library code (avoids dozens of I/E/W/UP issues in CI).
-extend-exclude = ["notebooks"]
+extend-exclude = ["notebooks", "api"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "B", "UP"]
@@ -49,7 +54,17 @@ select = ["E", "F", "I", "N", "W", "B", "UP"]
 ignore = ["N803", "N806"]
 
 [tool.ruff.lint.isort]
-known-third-party = ["wandb", "numpy", "torch", "torchvision", "hydra", "omegaconf"]
+known-third-party = [
+    "wandb",
+    "numpy",
+    "torch",
+    "torchvision",
+    "hydra",
+    "omegaconf",
+    "fastapi",
+    "uvicorn",
+    "PIL",
+]
 
 [tool.mypy]
 python_version = "3.11"
