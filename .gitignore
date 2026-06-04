@@ -156,12 +156,3 @@ wandb/
 
 # Hydra outputs
 outputs/
-
-# Reports and figures
-reports/figures/*.png
-reports/figures/*.jpg
-reports/figures/*.jpeg
-
-# Profiling stats
-stats.prof
-*.prof

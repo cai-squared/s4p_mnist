@@ -165,15 +165,15 @@ Then open `http://127.0.0.1:8000/docs`.
 **Health check (live deploy):**
 
 ![Cloud Run health endpoint](../reports/figures/cloud_run_health.png)
-*Figure 2: Live `/health` response — status ok, model loaded.*
+*Figure: Live `/health` response — status ok, model loaded.*
 
 **Predict test (live deploy):**
 
 ![Cloud Run predict via Swagger](../reports/figures/cloud_run_predict.png)
-*Figure 3: POST `/predict/image` with test_digit_upload.png.*
+*Figure: POST `/predict/image` with test_digit_upload.png.*
 
 ![Cloud Run predict result](../reports/figures/cloud_run_predict_result.png)
-*Figure 4: Response digit 7 with 99.99% confidence.*
+*Figure: Response digit 7 with 99.99% confidence.*
 
 ### 3.4 Cloud Run
 
@@ -194,7 +194,7 @@ The Dockerfile uses `S4P_SERVE=1` so the container runs uvicorn instead of the t
 **Monitoring (Cloud Run metrics):**
 
 ![Cloud Run metrics dashboard](../reports/figures/cloud_run_metrics.png)
-*Figure 5: Request count and latency metrics after live testing.*
+*Figure: Request count and latency metrics after live testing.*
 
 When the class ends we delete the Cloud Run service to avoid charges:
 
@@ -208,17 +208,15 @@ gcloud run services delete s4p-mnist-api --region us-central1
 
 The repository now includes a live demo app at `app.py` that calls the Cloud Run deployment endpoint for predictions.
 
-- The app sends each drawn or uploaded image to the backend inference endpoint at `MODEL_API_URL/predict/image`.
-- In Hugging Face Spaces, set a secret named `MODEL_API_URL` to the Cloud Run endpoint URL.
+- The app sends each drawn or uploaded image to the backend inference endpoint.
 - The app displays the predicted digit and confidence score in a friendly interface.
 
 This deployment is wired into GitHub Actions so pushing to `main` updates the Space automatically.
 
-The GitHub workflow requires the following repository secrets:
-- `HF_API_TOKEN` — Hugging Face API token with write access
-- `HF_SPACE_ID` — the Space repository identifier, for example `username/space-name`
+Try the app out for yourself [here](https://huggingface.co/spaces/caisquared/s4p_mnist).
 
-The deployed Space should also set `MODEL_API_URL` to the Cloud Run endpoint URL.
+![Hugging Face app](../reports/figures/hf_app.png)
+*Figure: Live Gradio app on Hugging Face Spaces.*
 
 ## 5. End-to-End Demo Recording
 
