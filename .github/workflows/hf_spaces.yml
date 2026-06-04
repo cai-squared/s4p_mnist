@@ -48,6 +48,9 @@ jobs:
           git clone "https://${HF_API_TOKEN}@huggingface.co/spaces/${HF_SPACE_ID}" space_repo
 
       - name: Sync files to space
+        env:
+          HF_API_TOKEN: ${{ secrets.HF_API_TOKEN }}
+          HF_SPACE_ID: ${{ secrets.HF_SPACE_ID }}
         run: |
           rsync -a --delete \
             --exclude='.git' \
@@ -66,10 +69,12 @@ jobs:
           cd space_repo
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
+          git config credential.helper store
+          echo "https://${HF_API_TOKEN}@huggingface.co" > ~/.git-credentials
           git add -A
           if git diff --cached --quiet; then
             echo 'No changes to deploy.'
           else
             git commit -m 'Deploy Hugging Face Space from GitHub Actions'
-            git push
+            git push "https://${HF_API_TOKEN}@huggingface.co/spaces/${HF_SPACE_ID}" HEAD:main
           fi
