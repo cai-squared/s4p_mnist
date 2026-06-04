@@ -204,7 +204,21 @@ gcloud run services delete s4p-mnist-api --region us-central1
 
 ## 4. Interactive UI
 
-### 4.1 Streamlit or Gradio app on Hugging Face Spaces
+### 4.1 Gradio app on Hugging Face Spaces
+
+The repository now includes a live demo app at `app.py` that calls the Cloud Run deployment endpoint for predictions.
+
+- The app sends each drawn or uploaded image to the backend inference endpoint at `MODEL_API_URL/predict/image`.
+- In Hugging Face Spaces, set a secret named `MODEL_API_URL` to the Cloud Run endpoint URL.
+- The app displays the predicted digit and confidence score in a friendly interface.
+
+This deployment is wired into GitHub Actions so pushing to `main` updates the Space automatically.
+
+The GitHub workflow requires the following repository secrets:
+- `HF_API_TOKEN` — Hugging Face API token with write access
+- `HF_SPACE_ID` — the Space repository identifier, for example `username/space-name`
+
+The deployed Space should also set `MODEL_API_URL` to the Cloud Run endpoint URL.
 
 ## 5. End-to-End Demo Recording
 
