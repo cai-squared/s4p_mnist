@@ -1,8 +1,8 @@
 """Unit tests for the S4P-MNIST data layer.
 
 Covers:
-* ``s4p_mnist.data.loaders``      – IDX binary parser, save/load round-trip
-* ``s4p_mnist.data.make_dataset`` – idempotency, --force flag, CLI exit codes
+* ``s4p_mnist.data.loaders``      - IDX binary parser, save/load round-trip
+* ``s4p_mnist.data.make_dataset`` - idempotency, --force flag, CLI exit codes
 
 All tests are self-contained: synthetic IDX binary files and temporary
 directories are created on the fly via pytest's ``tmp_path`` fixture so the
