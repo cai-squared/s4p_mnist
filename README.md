@@ -1,3 +1,12 @@
+---
+title: S4P MNIST
+emoji: 👁
+colorFrom: red
+colorTo: purple
+sdk: static
+pinned: false
+---
+
 # PROJECT - S4P MNIST
 
 ## 👥 Team Information
