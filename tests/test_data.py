@@ -347,9 +347,9 @@ class TestMakeDataset:
 
         monkeypatch.setattr("s4p_mnist.data.make_dataset.save_processed", counting_save)
         make_dataset(raw_dir=raw_dir, processed_dir=out, force=False)
-        assert call_count["n"] == 0, (
-            "save_processed called on second run without --force"
-        )
+        assert (
+            call_count["n"] == 0
+        ), "save_processed called on second run without --force"
 
     def test_force_triggers_reprocessing(
         self, raw_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -367,9 +367,9 @@ class TestMakeDataset:
 
         monkeypatch.setattr("s4p_mnist.data.make_dataset.save_processed", counting_save)
         make_dataset(raw_dir=raw_dir, processed_dir=out, force=True)
-        assert call_count["n"] == 1, (
-            "save_processed called on second run without --force"
-        )
+        assert (
+            call_count["n"] == 1
+        ), "save_processed called on second run without --force"
 
     def test_missing_raw_raises(self, tmp_path: Path) -> None:
         empty_raw = tmp_path / "raw"
