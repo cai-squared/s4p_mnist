@@ -65,14 +65,33 @@ jobs:
           HF_TOKEN:    ${{ secrets.HF_TOKEN }}
           HF_SPACE_NAME: ${{ secrets.HF_SPACE_NAME }}
         run: |
-          git add README.md
-          git commit -m "ci: stage HF Spaces README at root" --allow-empty
-          git remote add hf \
-            "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE_NAME}"
-          # Normal push (no --force). HF accepts fast-forwards. If this
-          # fails because the Space history diverged from your GitHub repo,
-          # reset the Space manually rather than force-pushing from CI.
-          git push hf HEAD:main
+          # Create a filtered clone without binary files
+          git clone --filter=blob:none \
+            "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE_NAME}" \
+            hf_space_repo || true
+          mkdir -p hf_space_repo
+
+          # Copy project files, excluding binary files and large directories
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='reports/figures' \
+            --exclude='*.png' \
+            --exclude='*.prof' \
+            --exclude='models/*.joblib' \
+            --exclude='data/raw' \
+            --exclude='data/processed' \
+            --exclude='outputs' \
+            --exclude='wandb' \
+            --exclude='logs' \
+            --exclude='.dvc' \
+            ./ hf_space_repo/
+
+          cd hf_space_repo
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "ci: sync from GitHub (binary files excluded)" --allow-empty
+          git push origin HEAD:main
 
       - name: Print Space URL
         run: |
