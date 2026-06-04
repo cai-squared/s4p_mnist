@@ -34,6 +34,7 @@ jobs:
           api.create_repo(
               repo_id=os.environ['HF_SPACE_ID'],
               repo_type='space',
+              space_sdk='static',
               token=os.environ['HF_API_TOKEN'],
               exist_ok=True,
           )
