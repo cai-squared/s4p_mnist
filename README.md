@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PROJECT - S4P MNIST
 
 ## 👥 Team Information
