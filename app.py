@@ -74,8 +74,7 @@ def build_interface() -> gr.Blocks:
 
         with gr.Row():
             image_input = gr.Image(
-                source="upload",
-                tool="editor",
+                sources=["upload", "webcam", "clipboard"],
                 type="pil",
                 label="Draw or upload a digit",
             )

@@ -3,7 +3,8 @@ title: S4P MNIST
 emoji: 👁
 colorFrom: red
 colorTo: purple
-sdk: static
+sdk: gradio
+app_file: app.py
 pinned: false
 ---
 
