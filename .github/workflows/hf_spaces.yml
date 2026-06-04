@@ -23,6 +23,9 @@ jobs:
       - name: Set up Python 3.11
         run: uv python install 3.11
 
+      - name: Create virtual environment
+        run: uv venv
+
       - name: Install dependencies (with dev extras)
         run: uv pip install -e ".[dev]"
 
