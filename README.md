@@ -108,6 +108,27 @@ make predict
 make help
 ```
 
+### Local Gradio Demo
+
+The repository includes `app.py`, a Gradio demo that forwards handwritten digit images to the deployed FastAPI endpoint.
+
+- Set `MODEL_API_URL` to your Cloud Run service URL.
+- Run locally with:
+
+```bash
+python app.py
+```
+
+### Hugging Face Space Deployment
+
+A GitHub Actions workflow (`.github/workflows/hf_spaces.yml`) deploys this repo to a Hugging Face Space when `main` is pushed.
+
+The workflow requires two GitHub secrets:
+- `HF_API_TOKEN` — Hugging Face API token with Space write permissions
+- `HF_SPACE_ID` — the Space repository identifier, e.g. `username/space-name`
+
+The deployed Space also uses the `MODEL_API_URL` environment variable to point to the Cloud Run backend endpoint.
+
 ### Configuration (Hydra — Phase 2)
 
 The professor wanted Hydra for Part F, so train and predict both read `configs/config.yaml` (the file that was already in the template). Same file holds CNN training settings and the `predict:` paths, which keeps the repo simple.
