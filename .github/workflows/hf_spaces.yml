@@ -36,7 +36,7 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Mypy
-        run: uv run mypy app.py gradio_app.py train_model.py
+        run: uv run mypy app.py src/s4p_mnist/
 
       - name: Pytest
         run: uv run pytest -v
