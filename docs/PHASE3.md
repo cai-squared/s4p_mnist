@@ -222,6 +222,8 @@ Try the app out for yourself [here](https://huggingface.co/spaces/caisquared/s4p
 
 ### 5.1 Recording in main README
 
+A YouTube video demonstrating the project has been added at the top of the README (under the HuggingFace metadata).
+
 ## 6. Documentation, Repository Updates & Cleanup
 
 ### 6.1 Comprehensive README

@@ -10,6 +10,8 @@ pinned: false
 
 # PROJECT - S4P MNIST
 
+**Live Demonstration:** [Link](https://www.youtube.com/watch?v=lf3HbEi7m9Y)
+
 ## 👥 Team Information
 
 - **Team Name:** S4P
