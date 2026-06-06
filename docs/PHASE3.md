@@ -110,7 +110,7 @@ To run the docker image, run
 
 ```
 docker run -it --rm \
-    --env-file .env WANDB_API_KEY=${WANDB_API_KEY} \
+    --env-file .env \
     -v "$(PWD)/data:/app/data" \
     -v "$(PWD)/models:/app/models" \
     caisquared/s4p_mnist:latest
