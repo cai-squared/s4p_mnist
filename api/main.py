@@ -71,6 +71,9 @@ def _ensure_model_from_gcs() -> None:
 def _startup() -> None:
     if os.environ.get("S4P_SKIP_MODEL_LOAD", "").lower() in {"1", "true", "yes"}:
         return
+    # Cloud Functions / Cloud Run: bind PORT quickly; load model on first request.
+    if os.environ.get("K_SERVICE"):
+        return
     try:
         _ensure_model_from_gcs()
         _load_model()
@@ -81,6 +84,7 @@ def _startup() -> None:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     try:
+        _ensure_model_from_gcs()
         _load_model()
         return HealthResponse(status="ok", model_loaded=True)
     except FileNotFoundError:
