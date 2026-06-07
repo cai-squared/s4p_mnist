@@ -38,7 +38,7 @@ to a scalable, monitored, and user-accessible deployment.
       reproducible data processing and experiment tracking
 - [x] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
       to ensure consistent, scalable execution
-- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
+- [x] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
 ---
 ## Architecture Diagram
