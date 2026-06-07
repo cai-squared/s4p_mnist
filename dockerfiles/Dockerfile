@@ -2,7 +2,7 @@
 # Multi-stage build for s4p_mnist
 
 # Stage 1: Builder
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim-bookworm AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN pip install uv
 RUN uv pip install -r requirements.txt --system
 
 # Stage 2: Runtime
-FROM python:3.11-slim
+FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 

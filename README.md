@@ -1,4 +1,16 @@
+---
+title: S4P MNIST
+emoji: 👁
+colorFrom: red
+colorTo: purple
+sdk: gradio
+app_file: app.py
+pinned: false
+---
+
 # PROJECT - S4P MNIST
+
+**Live Demonstration:** [Link](https://www.youtube.com/watch?v=lf3HbEi7m9Y)
 
 ## 👥 Team Information
 
@@ -26,7 +38,7 @@ to a scalable, monitored, and user-accessible deployment.
       reproducible data processing and experiment tracking
 - [x] 🐳 Containerize and automate the ML pipeline using Docker and CI/CD tools
       to ensure consistent, scalable execution
-- [ ] 🌐 Deploy the trained model as a live, user-accessible application capable
+- [x] 🌐 Deploy the trained model as a live, user-accessible application capable
       of making real-time predictions on new handwritten digit inputs
 ---
 ## Architecture Diagram
@@ -47,15 +59,12 @@ flowchart TD
 ## Phase Deliverables
 
 ### Phase 1: Project Design & Model Development
-- See [PHASE1.md](PHASE1.md) for detailed checklist
 - See [docs/PHASE1.md](docs/PHASE1.md) for phase documentation.
 
 ### Phase 2: Containerization & Monitoring
-- See [PHASE2.md](PHASE2.md) for detailed checklist
 - See [docs/PHASE2.md](docs/PHASE2.md) for phase documentation.
 
 ### Phase 3: CI/CD & Deployment
-- See [PHASE3.md](PHASE3.md) for detailed checklist
 - See [docs/PHASE3.md](docs/PHASE3.md) for phase documentation.
 ---
 ## Setup Instructions
@@ -107,6 +116,27 @@ make predict
 # See all available commands
 make help
 ```
+
+### Local Gradio Demo
+
+The repository includes `app.py`, a Gradio demo that forwards handwritten digit images to the deployed FastAPI endpoint.
+
+- Set `MODEL_API_URL` to your Cloud Run service URL.
+- Run locally with:
+
+```bash
+python app.py
+```
+
+### Hugging Face Space Deployment
+
+A GitHub Actions workflow (`.github/workflows/hf_spaces.yml`) deploys this repo to a Hugging Face Space when `main` is pushed.
+
+The workflow requires two GitHub secrets:
+- `HF_API_TOKEN` — Hugging Face API token with Space write permissions
+- `HF_SPACE_ID` — the Space repository identifier, e.g. `username/space-name`
+
+The deployed Space also uses the `MODEL_API_URL` environment variable to point to the Cloud Run backend endpoint.
 
 ### Configuration (Hydra — Phase 2)
 

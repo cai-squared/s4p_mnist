@@ -325,4 +325,8 @@ The base README has been updated with a Phase 3 section that links to this docum
 *Figure: Main README rendered on GitHub, showing the Live Demonstration link near the top.*
 
 ### 6.2 PHASE3.md
+
+This document (`docs/PHASE3.md`) records each Phase 3 deliverable with its file/directory reference, a screenshot of the working result, and a short explanation. It is linked from
+the main README.
+
 ### 6.3 GCP Resource Cleanup

@@ -1,0 +1,71 @@
+name: Continuous Machine Learning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Required so the bot can post the PR comment using GITHUB_TOKEN.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  train-and-report:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install CML runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+      - name: Set up CML
+        uses: iterative/setup-cml@v2
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Train model
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: python src/s4p_mnist/train_model.py
+
+      - name: Write CML report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## Model performance report" > report.md
+          echo "" >> report.md
+          echo "### W&B tracking" >> report.md
+          if [ -f wandb_report.md ]; then
+            cat wandb_report.md >> report.md
+            echo "" >> report.md
+          else
+            echo "W&B run metadata unavailable." >> report.md
+            echo "" >> report.md
+          fi
+          echo "### Classification report" >> report.md
+          echo '```' >> report.md
+          cat classification_report.txt >> report.md
+          echo '```' >> report.md
+          echo "" >> report.md
+          echo "### Confusion matrix" >> report.md
+          echo '![](./confusion_matrix.png)' >> report.md
+          cml comment create --publish report.md

@@ -1,0 +1,102 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+        with:
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: Set up Python 3.11
+        run: uv python install 3.11
+
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install dependencies (with dev extras)
+        run: uv pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Mypy
+        run: uv run mypy app.py src/s4p_mnist/
+
+      - name: Pytest
+        run: uv run pytest -v
+
+  deploy:
+    name: Deploy to HF Space
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Configure git identity for the push
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Push to Hugging Face Space
+        env:
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+          HF_TOKEN:    ${{ secrets.HF_TOKEN }}
+          HF_SPACE_NAME: ${{ secrets.HF_SPACE_NAME }}
+        run: |
+          # Create a filtered clone without binary files
+          git clone --filter=blob:none \
+            "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE_NAME}" \
+            hf_space_repo || true
+          mkdir -p hf_space_repo
+
+          # Copy project files, excluding binary files and large directories
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='reports/figures' \
+            --exclude='*.png' \
+            --exclude='*.prof' \
+            --exclude='models/*.joblib' \
+            --exclude='data/raw' \
+            --exclude='data/processed' \
+            --exclude='outputs' \
+            --exclude='wandb' \
+            --exclude='logs' \
+            --exclude='.dvc' \
+            ./ hf_space_repo/
+
+          cd hf_space_repo
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "ci: sync from GitHub (binary files excluded)" --allow-empty
+          git push origin HEAD:main
+
+      - name: Print Space URL
+        run: |
+          echo "Deployed: https://huggingface.co/spaces/${{ secrets.HF_USERNAME }}/${{ secrets.HF_SPACE_NAME }}"
