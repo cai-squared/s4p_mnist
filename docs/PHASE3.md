@@ -331,3 +331,25 @@ This document (`docs/PHASE3.md`) records each Phase 3 deliverable with its file/
 the main README.
 
 ### 6.3 GCP Resource Cleanup
+
+Section 3 owner: Sai Subodh Gundam Raju.
+
+- [x] **Services stopped / resources removed**
+- [x] **Evidence:** screenshot of empty/cleaned GCP console + explanation below
+
+After final submission, all billable GCP resources from Section 3 were deleted: Cloud Run (`s4p-mnist-api`), Cloud Functions (`s4p-mnist-api-fn`), GCS bucket (`s4p-mnist-training-data`), and Artifact Registry repo (`s4p-mnist`, `us-central1`). The Vertex AI job `s4p-mnist-train` was already **Finished** and left in the console for grading only.
+
+**Explanation:** Live endpoints and storage were removed so the `s4p-mnist` project would not keep charging after the course. Cloud Run and Cloud Functions were deleted first; then the training bucket and Docker image repository were removed.
+
+**Commands (Cloud Shell):**
+
+```
+gcloud config set project s4p-mnist
+gcloud run services delete s4p-mnist-api --region=us-central1 --quiet
+gcloud functions delete s4p-mnist-api-fn --region=us-central1 --gen2 --quiet
+gsutil -m rm -r gs://s4p-mnist-training-data
+gcloud artifacts repositories delete s4p-mnist --location=us-central1 --quiet
+```
+
+![GCP cleanup](../reports/figures/gcp_cleanup.png)
+*Figure: GCP console after cleanup — no Cloud Run services remaining.*
