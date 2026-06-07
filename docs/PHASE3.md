@@ -233,7 +233,7 @@ gcloud functions deploy s4p-mnist-api-fn \
 
 Cloud Functions requires `main.py` at the repo root (re-exports `handler` from `api/main.py`). Run the command from inside the cloned repo, not from `~`.
 
-**Cloud Functions URL:** *(paste your function URL after deploy)*
+**Cloud Functions URL:** https://us-central1-s4p-mnist.cloudfunctions.net/s4p-mnist-api-fn
 
 Local test on Windows:
 
