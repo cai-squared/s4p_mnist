@@ -213,6 +213,8 @@ The repository now includes a live demo app at `app.py` that calls the Cloud Run
 
 This deployment is wired into GitHub Actions so pushing to `main` updates the Space automatically.
 
+The redeploy workflow is at .github/workflows/hf_spaces.yml
+
 Try the app out for yourself [here](https://huggingface.co/spaces/caisquared/s4p_mnist).
 
 ![Hugging Face app](../reports/figures/hf_app.png)
