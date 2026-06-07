@@ -229,5 +229,11 @@ A YouTube video demonstrating the project has been added at the top of the READM
 ## 6. Documentation, Repository Updates & Cleanup
 
 ### 6.1 Comprehensive README
+
+The base README has been updated with a Phase 3 section that links to this document and summarizes the new tools and services added in this phase (GitHub Actions CI/CD, automated Docker builds, CML, GCP Artifact Registry and Cloud Run, FastAPI, and the Gradio app on Hugging Face Spaces). The end-to-end demo recording is embedded near the top of the README as a **Live Demonstration** link.
+
+![Rendered README](../reports/figures/readme_rendered.png)
+*Figure: Main README rendered on GitHub, showing the Live Demonstration link near the top.*
+
 ### 6.2 PHASE3.md
 ### 6.3 GCP Resource Cleanup
