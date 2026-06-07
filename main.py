@@ -34,7 +34,9 @@ def handler(request):  # type: ignore[no-untyped-def]
         for key, value in response.headers.items()
         if key.lower() not in excluded
     ]
-    return Response(response.content, status=response.status_code, headers=response_headers)
+    return Response(
+        response.content, status=response.status_code, headers=response_headers
+    )
 
 
 __all__ = ["handler"]
