@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any, Literal
 
@@ -174,6 +175,13 @@ def train(
     model.save(out_path)
     logger.info("Saved trained model to %s", out_path)
 
+    gcs_model_out = os.environ.get("S4P_GCS_MODEL_OUTPUT_URI", "").strip()
+    if gcs_model_out:
+        from s4p_mnist.utils.io import upload_gcs_file
+
+        upload_gcs_file(out_path, gcs_model_out)
+        logger.info("Uploaded trained model to %s", gcs_model_out)
+
     try:
         _, _, X_test_img, y_test_u8 = load_processed(data_path)
         x_test = X_test_img.reshape(X_test_img.shape[0], -1).astype(
@@ -257,6 +265,13 @@ def main(cfg: DictConfig) -> None:
 
     data_path = _resolve_under_root(str(cfg.paths.data_processed))
     model_dir = _resolve_under_root(str(cfg.paths.models_dir))
+
+    gcs_data = os.environ.get("S4P_GCS_DATA_URI", "").strip()
+    if gcs_data:
+        from s4p_mnist.utils.io import sync_gcs_prefix_to_dir
+
+        sync_gcs_prefix_to_dir(gcs_data, data_path)
+        logger.info("Synced training data from %s to %s", gcs_data, data_path)
 
     out_dir = Path(HydraConfig.get().runtime.output_dir)
 

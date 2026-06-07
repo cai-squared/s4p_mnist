@@ -55,11 +55,24 @@ def _run_predict(x: np.ndarray) -> tuple[int, float]:
     return digit, confidence
 
 
+def _ensure_model_from_gcs() -> None:
+    gcs_uri = os.environ.get("S4P_GCS_MODEL_URI", "").strip()
+    if not gcs_uri:
+        return
+    local = _model_path()
+    if local.is_file():
+        return
+    from s4p_mnist.utils.io import download_gcs_file
+
+    download_gcs_file(gcs_uri, local)
+
+
 @app.on_event("startup")
 def _startup() -> None:
     if os.environ.get("S4P_SKIP_MODEL_LOAD", "").lower() in {"1", "true", "yes"}:
         return
     try:
+        _ensure_model_from_gcs()
         _load_model()
     except FileNotFoundError:
         pass

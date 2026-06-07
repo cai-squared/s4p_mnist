@@ -49,7 +49,6 @@ jobs:
     name: Deploy to HF Space
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
 
     steps:
       - name: Checkout
