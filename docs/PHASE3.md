@@ -226,6 +226,7 @@ gcloud functions deploy s4p-mnist-api-fn \
   --trigger-http \
   --allow-unauthenticated \
   --memory=2Gi \
+  --cpu=2 \
   --timeout=300s \
   --set-env-vars=S4P_GCS_MODEL_URI=gs://s4p-mnist-training-data/models/model.joblib
 ```
