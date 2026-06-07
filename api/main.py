@@ -126,9 +126,3 @@ async def predict_image(file: UploadFile = File(...)) -> PredictResponse:
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return PredictResponse(digit=digit, confidence=confidence)
-
-
-# Cloud Functions Gen 2 entry point (gcloud --entry-point=api.main.handler).
-from mangum import Mangum
-
-handler = Mangum(app, lifespan="off")

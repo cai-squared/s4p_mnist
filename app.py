@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import os
+from typing import cast
 
 import gradio as gr
 import requests
@@ -78,7 +79,7 @@ def build_interface() -> gr.Blocks:
                 type="pil",
                 label="Draw or upload a digit",
             )
-            with gr.Column(scale=0.5):
+            with gr.Column(scale=1):
                 digit_output = gr.Textbox(label="Predicted digit", interactive=False)
                 confidence_output = gr.Textbox(label="Confidence", interactive=False)
                 status_output = gr.Textbox(label="Status", interactive=False)
@@ -98,7 +99,7 @@ def build_interface() -> gr.Blocks:
             "3. The app sends the image to the Cloud Run model endpoint "
             "and returns the predicted digit with confidence."
         )
-    return demo
+    return cast(gr.Blocks, demo)
 
 
 demo = build_interface()

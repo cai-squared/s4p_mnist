@@ -6,7 +6,8 @@ FROM python:3.11-slim-bookworm AS builder
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements.txt pyproject.toml ./
+COPY src ./src
 RUN pip install uv
 RUN uv pip install -r requirements.txt --system
 
