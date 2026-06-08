@@ -331,18 +331,22 @@ make docs
 
 - **Cindy Cai** - Data exploration, EDA notebook, code review;
   Docker containerization (Dockerfile, build/run instructions, environment consistency) (Phase 2);
-  Profiling & optimization (cProfile, PyTorch Profiler, MPS device support) (Phase 2)
+  Profiling & optimization (cProfile, PyTorch Profiler, MPS device support) (Phase 2);
+  Automated Docker builds and CML, Hugging Face Spaces UI, end-to-end demo recording (Phase 3)
 
 - **Riffa Hammed** - Data pipeline (raw MNIST IDX files → processed .npy arrays);
   WandB experiment tracking and system monitoring (Phase 2);
-  Monitoring & debugging (pdb/ipdb, debug scenarios, model assertion checks) (Phase 2)
+  Monitoring & debugging (pdb/ipdb, debug scenarios, model assertion checks) (Phase 2);
+  Continuous integration and unit testing (pytest, GitHub Actions CI, pre-commit hooks) (Phase 3)
 
 - **Sai Subodh Gundam Raju** - Model development and training (six algorithms including CNN, ~99.5% accuracy);
-  Hydra configuration management (train and predict CLIs, config validation) (Phase 2)
+  Hydra configuration management (train and predict CLIs, config validation) (Phase 2);
+  GCP deployment (Artifact Registry, Cloud Run, FastAPI inference service) (Phase 3)
 
 - **Saumyaa Kannan** - Project documentation (README, PHASE1.md, project description);
   Application logging setup with rich+logging (Phase 2);
-  PHASE2.md documentation and README updates (Phase 2)
+  PHASE2.md documentation, and README updates (Phase 2);
+  PHASE3.md documentation, and README updates (Phase 3)
 
 ---
 ## References
