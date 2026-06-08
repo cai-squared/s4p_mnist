@@ -196,6 +196,18 @@ python -m s4p_mnist.train_model training.wandb=false
 - **wandb** >= 0.18.0 - Weights & Biases experiment tracking and system monitoring
 ### Data Version Control
 - **dvc** >= 3.55.0 - Data Version Control
+### API & Serving (Phase 3)
+- **fastapi** >= 0.115.0 - REST API framework for the inference service
+- **uvicorn[standard]** >= 0.30.0 - ASGI server for FastAPI
+- **python-multipart** >= 0.0.9 - File upload handling for the image endpoint
+- **pillow** >= 10.0.0 - Image decoding for uploaded digits
+### Deployment & Cloud (Phase 3)
+- **google-cloud-storage** >= 2.18.0 - GCS access for dataset and model artifacts
+- **functions-framework** >= 3.8.0 - GCP Cloud Functions Gen 2 runtime
+- **mangum** >= 0.19.0 - ASGI adapter so FastAPI runs on Cloud Functions
+### Interactive UI (Phase 3)
+- **gradio** >= 3.0 - Hugging Face Spaces demo interface
+- **requests** >= 2.31.0 - Calls the deployed inference endpoint from the Gradio app
 ---
 ## Project Structure
 
@@ -232,7 +244,9 @@ s4p_mnist/                  # Repository root
 │       ├── train_model.py             # Training CLI
 │       └── predict_model.py           # Inference CLI
 ├── tests/                             # Unit and integration tests
+│   ├── __init__.py
 │   ├── conftest.py
+│   ├── test_data.py
 │   └── test_model.py
 ├── data/
 │   ├── raw/                           # Immutable raw data
@@ -252,7 +266,10 @@ s4p_mnist/                  # Repository root
 │   └── config.yaml
 ├── api/                               # FastAPI service (if selected)
 ├── .github/workflows/                 # GitHub Actions CI/CD
-│   └── ci.yml
+│   ├── ci.yml
+│   ├── cml.yml
+│   ├── docker.yml
+│   └── hf_spaces.yml
 ├── PHASE1.md                          # Phase 1 deliverables checklist
 ├── PHASE2.md                          # Phase 2 deliverables checklist
 ├── PHASE3.md                          # Phase 3 deliverables checklist
@@ -352,9 +369,9 @@ make docs
 ## References
 
 - [Project Documentation](docs/index.md)
-- [Phase 1 — Project Design & Model Development](PHASE1.md)
-- [Phase 2 — Containerization & Monitoring](PHASE2.md)
-- [Phase 3 — CI/CD & Deployment](PHASE3.md)
+- [Phase 1 — Project Design & Model Development](docs/PHASE1.md)
+- [Phase 2 — Containerization & Monitoring](docs/PHASE2.md)
+- [Phase 3 — CI/CD & Deployment](docs/PHASE3.md)
 ---
 ## License
 
