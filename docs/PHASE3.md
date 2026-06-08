@@ -127,8 +127,6 @@ An example PR is at this link: [PR 23](https://github.com/cai-squared/s4p_mnist/
 
 ## 3. Deployment on Google Cloud Platform (GCP)
 
-Section 3 owner: Sai Subodh Gundam Raju.
-
 **Cloud Run URL (3.4):** https://s4p-mnist-api-912752055925.us-central1.run.app
 
 ### 3.1 GCP Artifact Registry
@@ -332,12 +330,7 @@ the main README.
 
 ### 6.3 GCP Resource Cleanup
 
-Section 3 owner: Sai Subodh Gundam Raju.
-
-- [x] **Services stopped / resources removed**
-- [x] **Evidence:** screenshot of empty/cleaned GCP console + explanation below
-
-After final submission, all billable GCP resources from Section 3 were deleted: Cloud Run (`s4p-mnist-api`), Cloud Functions (`s4p-mnist-api-fn`), GCS bucket (`s4p-mnist-training-data`), and Artifact Registry repo (`s4p-mnist`, `us-central1`). The Vertex AI job `s4p-mnist-train` was already **Finished** and left in the console for grading only.
+After final submission, all billable GCP resources from Section 3 were deleted: Cloud Run (`s4p-mnist-api`), Cloud Functions (`s4p-mnist-api-fn`), GCS bucket (`s4p-mnist-training-data`), and Artifact Registry repo (`s4p-mnist`, `us-central1`). The Vertex AI job `s4p-mnist-train` was already **finished** and left in the console for grading only.
 
 **Explanation:** Live endpoints and storage were removed so the `s4p-mnist` project would not keep charging after the course. Cloud Run and Cloud Functions were deleted first; then the training bucket and Docker image repository were removed.
 
