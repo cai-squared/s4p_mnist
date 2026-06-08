@@ -173,7 +173,6 @@ make train
 # Disable W&B if needed
 python -m s4p_mnist.train_model training.wandb=false
 ```
-
 ---
 ## Technology Stack
 
@@ -256,6 +255,9 @@ s4p_mnist/                  # Repository root
 ├── reports/
 │   └── figures/                       # Generated analysis and figures
 ├── docs/                              # MkDocs documentation
+│   ├── PHASE1.md                          # Phase 1 deliverables checklist
+│   ├── PHASE2.md                          # Phase 2 deliverables checklist
+│   ├── PHASE3.md                          # Phase 3 deliverables checklist
 │   ├── mkdocs.yml
 │   ├── index.md
 │   ├── getting_started.md
@@ -270,9 +272,6 @@ s4p_mnist/                  # Repository root
 │   ├── cml.yml
 │   ├── docker.yml
 │   └── hf_spaces.yml
-├── PHASE1.md                          # Phase 1 deliverables checklist
-├── PHASE2.md                          # Phase 2 deliverables checklist
-├── PHASE3.md                          # Phase 3 deliverables checklist
 ├── .pre-commit-config.yaml            # Pre-commit hooks (Ruff, mypy)
 ├── Makefile                           # Common commands
 ├── docker-compose.yaml                # Docker Compose setup
